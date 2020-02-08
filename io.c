@@ -1,5 +1,5 @@
 asm(".code16gcc");
-asm("jmp $main");
+asm("jmpl $0x0000, $main");
 void timer(unsigned short high, unsigned short low)
 {
 	asm volatile(
@@ -67,10 +67,11 @@ void _type(const char *s, unsigned short freq, unsigned short high,
 void main(void)
 {
 	asm volatile(
-		"mov $0x8000, %ax\n"
+		"xor %ax, %ax\n"
 		"mov %ax, %ds\n"
 		"mov %ax, %es\n"
-		"mov $0x0000, %esp\n"
+		"mov %ax, %ss\n"
+		"mov $0x1000, %esp\n"
 	);
 	type("Press any key to reboot...\r\n");
 	(void)getc();

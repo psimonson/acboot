@@ -21,7 +21,7 @@ boot.bin: boot.asm
 disk-clean:
 	rm -f floppy.img
 
-disk: disk-clean boot.bin
+disk: disk-clean all
 	mkfs.msdos -C floppy.img 1440
 	dd if=boot.bin of=floppy.img bs=512 count=1 conv=notrunc
 	dd if=io.sys of=floppy.img seek=1 bs=512 conv=notrunc
@@ -29,5 +29,5 @@ disk: disk-clean boot.bin
 run: disk
 	qemu-system-i386 -fda floppy.img -boot a -soundhw pcspk
 
-clean:
+clean: disk-clean
 	rm -f *.o io.elf io.sys boot.bin

@@ -2,18 +2,12 @@
 ; by Philip R. Simonson
 ; ===============================================================
 [bits 16]
-[org 0x07c0]
+[org 0x7c00]
 [section .text]
 global _start
 jmp short _start
 
-; data
-loading db "Loading system...",0ah,0dh,24h
-done db "Done loading!",0ah,0dh,24h
-reboot db "Rebooting...",0ah,0dh,24h
-error db "Disk read error.",0ah,0dh,24h
-crlf db 0ah,0dh,24h
-drive db 0
+; BPB here
 
 _start:
 	mov byte [drive], dl
@@ -22,19 +16,19 @@ _start:
 	mov es, ax
 	cli
 	mov ss, ax
-	mov sp, 0x7c00
+	mov sp, 0xffff
 	sti
 
 	mov si, loading
 	call print
 
 	; load some sectors from disk
-	mov bx, 0x8000
+	mov bx, 0x1000
 	mov es, bx
 	xor bx, bx
+	mov al, 2
 	call read_sector
-	call getc
-	push 0x8000
+	push 0x1000
 	push 0x0000
 	retf
 
@@ -61,7 +55,6 @@ print:
 
 read_sector:
 	mov ah, 02h
-	mov al, 02h
 	mov ch, 0
 	mov cl, 2
 	mov dh, 0
@@ -78,6 +71,14 @@ read_sector:
 	mov si, error
 	call print
 	jmp short read_sector
+
+; data
+loading db "Loading system...",0ah,0dh,24h
+done db "Done loading!",0ah,0dh,24h
+reboot db "Rebooting...",0ah,0dh,24h
+error db "Disk read error.",0ah,0dh,24h
+crlf db 0ah,0dh,24h
+drive db 0
 
 times 510-($-$$) db 0
 dw 0xaa55
