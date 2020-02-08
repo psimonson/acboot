@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=gnu89 -m32 -Wall -Wextra -Wno-unused-parameter
-CFLAGS+=-fno-builtin -nostdlib -ffreestanding -fno-stack-protector
-LDFLAGS=-m elf_i386 -T link.ld
+CFLAGS+=-static -fno-builtin -ffreestanding -fno-stack-protector
+LDFLAGS=-melf_i386 -T link.ld
 
 .PHONY: all disk run clean disk-clean
 all: boot.bin io.sys
