@@ -23,14 +23,12 @@ _start:
 	call print
 
 	; load some sectors from disk
-	mov bx, 0x1000
+	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
 	mov al, 2
 	call read_sector
-	push 0x1000
-	push 0x0000
-	retf
+	jmp 0x0100:0x0000
 
 	mov si, reboot
 	call print

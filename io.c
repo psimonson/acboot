@@ -49,7 +49,7 @@ void beep(void)
 	outb(0x42, (unsigned char)(freq >> 8));
 	outb(0x61, inb(0x61) | 0x03);
 	timer(0x0005, 0x05a0);
-	outb(0x61, inb(0x61) & 0x3f);
+	outb(0x61, inb(0x61) & 0x3c);
 }
 /* Print text like a typer writer.
  */
@@ -66,13 +66,6 @@ void _type(const char *s, unsigned short freq, unsigned short high,
  */
 void main(void)
 {
-	asm volatile(
-		"xor %ax, %ax\n"
-		"mov %ax, %ds\n"
-		"mov %ax, %es\n"
-		"mov %ax, %ss\n"
-		"mov $0x1000, %esp\n"
-	);
 	type("Press any key to reboot...\r\n");
 	(void)getc();
 	asm volatile(
