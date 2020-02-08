@@ -1,5 +1,7 @@
 asm(".code16gcc");
 asm("jmpl $0x0000, $main");
+#include <stddef.h>
+#include <stdarg.h>
 /* Timer for waiting inside of code.
  */
 void timer(unsigned short high, unsigned short low)
@@ -85,16 +87,62 @@ void _type(const char *s, unsigned short freq, unsigned short high,
 int strlen(const char *s)
 {
 	int i;
-	for(i = 0; *s != '\0'; i++);
+	for(i = 0; *s != '\0'; s++, i++);
 	return i;
 }
 /* This function is used for printf.
  */
-static void print(const char *data)
+void print(const char *data, int len)
 {
 	const unsigned char *bytes = (const unsigned char*)data;
-	while(*bytes)
-		putc(*bytes++);
+	int i;
+	for(i = 0; i < len; i++)
+		putc(bytes[i]);
+}
+/* Print formatted output to screen.
+ */
+int printf(const char *fmt, ...)
+{
+	int written;
+	va_list ap;
+	written = 0;
+	va_start(ap, fmt);
+	while(*fmt != '\0') {
+		const char *p = NULL;
+
+		if(fmt[0] != '%' || fmt[1] == '%') {
+			int amount = 1;
+			if(fmt[0] == '%')
+				fmt++;
+			while(fmt[amount] && fmt[amount] != '%')
+				amount++;
+			print(fmt, amount);
+			fmt += amount;
+			written += amount;
+			continue;
+		}
+		p = fmt++;
+		if(*fmt == 'c') {
+			char c = (char)va_arg(ap, int);
+			fmt++;
+			print(&c, sizeof(c));
+			written++;
+		} else if(*fmt == 's') {
+			const char *str = va_arg(ap, const char *);
+			int len = strlen(str);
+			fmt++;
+			print(str, len);
+			written += len;
+		} else {
+			int len = strlen(fmt);
+			fmt = p;
+			print(fmt, len);
+			written += len;
+			fmt += len;
+		}
+	}
+	va_end(ap);
+	return written;
 }
 /* Get input from user into a buffer.
  */
@@ -105,19 +153,17 @@ void gets(char *s, int size)
 		*s++ = c;
 		putc(c);
 	}
-	print("\r\n");
+	printf("\r\n");
 	*s = '\0';
 }
-/* Entry point for boot sector.
+/* Entry point for boot program.
  */
 void main(void)
 {
 	char buf[32];
-	print("Please enter your name: ");
+	printf("Please enter your name: ");
 	gets(buf, sizeof(buf));
-	print("Hello, ");
-	print(buf);
-	print("!\r\n");
+	printf("Hello, %s!\r\n", buf);
 	type("Press any key to reboot...\r\n");
 	(void)getc();
 	asm volatile(
