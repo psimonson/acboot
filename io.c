@@ -49,18 +49,24 @@ void putc(int c)
 		"b"(0x0007), "c"(0x0001)
 	);
 }
+/* Check if character is whitespace.
+ */
+int isspace(int c)
+{
+	return (c == ' ' || c == '\t' || c == '\v' || c == '\f' || c == '\r'
+		|| c == '\n');
+}
 /* Beep system.
  */
-void beep(void)
+void beep(unsigned short freq, unsigned short high, unsigned short low)
 {
-	const unsigned short freq = 4560;
 	outb(0x43, 182);
 	outb(0x42, (unsigned char)(freq));
 	outb(0x42, (unsigned char)(freq >> 8));
 	outb(0x61, inb(0x61) | 0x03);
-	timer(0x0003, 0x0a20);
+	timer(high, low);
 	outb(0x61, inb(0x61) & 0x3c);
-	timer(0x0003, 0x0a20);
+	timer(high, low);
 }
 /* Print text like a typer writer.
  */
@@ -69,7 +75,8 @@ void _type(const char *s, unsigned short freq, unsigned short high,
 {
 	while(*s) {
 		putc(*s++);
-		beep();
+		if(!isspace(*s))
+			beep(4560, 3, 0x0a20);
 	}
 }
 #define type(m) _type(m, 4560, 0x0005, 0x05a0);
