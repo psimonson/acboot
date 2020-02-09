@@ -20,7 +20,7 @@ struct file {
 	unsigned char id;
 	unsigned char num_sectors;
 	unsigned char start;
-	unsigned char _unused;
+	unsigned char _unused[3];
 	unsigned int _reserved;
 	unsigned short _reserved2;
 };
@@ -31,7 +31,7 @@ void init_entry(struct file *entry, unsigned char id,
 {
 	if(entry == NULL) return;
 	entry->id = id;
-	entry->_unused = 0;
+	memset(entry->_unused, 0, 7);
 	entry->num_sectors = num_sectors;
 	entry->start = start;
 	entry->_reserved = 0;
@@ -89,6 +89,7 @@ int write_table(const char *filename, struct file *table)
 	total_bytes = write(fd, table, sizeof(struct file)*MAXFILES);
 	close(fd);
 	printf("File %s created totaling %d bytes.\n", filename, total_bytes);
+	printf("Size of table struct is %lu.\n", sizeof(struct file));
 	return 0;
 }
 /* Program to create a simple file system.
