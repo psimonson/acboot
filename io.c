@@ -2,6 +2,7 @@ asm(".code16gcc");
 asm("jmpl $0x0000, $main");
 #include <stddef.h>
 #include <stdarg.h>
+unsigned char bios_drive = -1;
 /* Timer for waiting inside of code.
  */
 void timer(unsigned short high, unsigned short low)
@@ -90,6 +91,36 @@ int strlen(const char *s)
 	for(i = 0; *s != '\0'; s++, i++);
 	return i;
 }
+/* Reverse string in place.
+ */
+void reverse(char *s)
+{
+	char *p, *t;
+	for(t = s; *t != '\0'; t++);
+	t--;
+	for(p = s; *p != '\0' && *p != *t; p++,t--) {
+		char c = *s;
+		*s = *t;
+		*t = c;
+	}
+}
+/* Convert decimal number to string.
+ */
+void itoa(int n, char *s, int size)
+{
+	char *p = s;
+	int sign;
+
+	if((sign = n) < 0)
+		n = -n;
+	do {
+		*p++ = n % 10 + '0';
+	} while(--size > 0 && (n /= 10) > 0);
+	if(sign < 0)
+		*p++ = '-';
+	*p = '\0';
+	reverse(s);
+}
 /* This function is used for printf.
  */
 void print(const char *data, int len)
@@ -127,6 +158,15 @@ int printf(const char *fmt, ...)
 			fmt++;
 			print(&c, sizeof(c));
 			written++;
+		} else if(*fmt == 'd') {
+			char buf[32]; /* very large size */
+			int len; /* length of string in buf */
+			int n = va_arg(ap, int);
+			fmt++;
+			itoa(n, buf, sizeof(buf));
+			len = strlen(buf);
+			print(buf, len);
+			written += len;
 		} else if(*fmt == 's') {
 			const char *str = va_arg(ap, const char *);
 			int len = strlen(str);
@@ -161,9 +201,13 @@ void gets(char *s, int size)
 void main(void)
 {
 	char buf[32];
+	unsigned short drive = -1;
+	asm volatile("" : "=d"(drive));
+	bios_drive = drive & 0x00ff;
 	printf("Please enter your name: ");
 	gets(buf, sizeof(buf));
 	printf("Hello, %s!\r\n", buf);
+	printf("BIOS drive: %d\r\n", bios_drive);
 	type("Press any key to reboot...\r\n");
 	(void)getc();
 	asm volatile(

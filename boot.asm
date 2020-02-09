@@ -26,7 +26,7 @@ _start:
 	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
-	mov al, 4
+	mov al, 5
 	call read_sector
 	jmp 0x0100:0x0000
 
