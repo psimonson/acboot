@@ -23,13 +23,20 @@ _start:
 	call print
 
 	; load some sectors from disk
-	mov bx, 0x0200
+	mov bx, word [root]
+	mov ax, 512
 	mov byte [sector], 1
 	call read_sectors
 
 	; load kernel
+	mov ax, 512
+	mov bx, 3
+	mul bx
+	mov word [kernel], ax
 	call load_kernel
-	jmp 0x0100:0x0000
+	push 0x0000
+	push word [kernel]
+	retf
 	call reboot
 
 getc:
@@ -50,19 +57,17 @@ print:
 	ret
 
 load_kernel:
-	mov bx, 0x0200
+	mov bx, word [root]
 .next:
 	mov al, byte [bx]
 	cmp al, 2
 	jne .no_match
 .match:
+	xor cx, cx
 	mov cl, byte [bx+2]
 	mov byte [sector], cl
-.loop:
+	mov bx, word [kernel]
 	call read_sectors
-	inc byte [sector]
-	cmp byte [sector], 5
-	jne .loop
 	mov si, done
 	call print
 	ret
@@ -123,6 +128,7 @@ error db "Disk read error.",0ah,0dh,24h
 crlf db 0ah,0dh,24h
 drive db 0
 root dw 0x0100
+kernel dw 0x0000
 sector db 0x00
 progress db 2eh,24h
 fail db 0ah,0dh,"Disk read error :(",0ah,0dh,24h

@@ -27,7 +27,7 @@ struct file {
 /* Initialise ftable entry.
  */
 void init_entry(struct file *entry, unsigned char id,
-	unsigned int num_sectors, unsigned short start)
+	unsigned char num_sectors, unsigned char start)
 {
 	if(entry == NULL) return;
 	entry->id = id;
@@ -102,7 +102,8 @@ int main(void)
 	for(i = 0; i < MAXFILES; i++)
 		init_entry(&ftable[i], 0, 0, 0);
 	init_entry(&ftable[0], 0, 0, 1);
-	init_entry(&ftable[1], 1, 5, 4);
+	init_entry(&ftable[1], 1, 1, 2);
+	init_entry(&ftable[2], 2, 5, 3);
 	errno = 0;
 	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));
