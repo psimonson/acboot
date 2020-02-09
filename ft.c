@@ -18,9 +18,11 @@
 /* File table structure */
 struct file {
 	unsigned char id;
-	unsigned char _unused[3];
-	unsigned int num_sectors;
-	unsigned short start;
+	unsigned char num_sectors;
+	unsigned char start;
+	unsigned char _unused;
+	unsigned int _reserved;
+	unsigned short _reserved2;
 };
 /* Initialise ftable entry.
  */
@@ -29,9 +31,11 @@ void init_entry(struct file *entry, unsigned char id,
 {
 	if(entry == NULL) return;
 	entry->id = id;
-	memset(entry->_unused, 0, 3);
+	entry->_unused = 0;
 	entry->num_sectors = num_sectors;
 	entry->start = start;
+	entry->_reserved = 0;
+	entry->_reserved2 = 0;
 }
 /* Print binary table from entry.
  */
@@ -60,18 +64,34 @@ int write_file(int fout, unsigned char sector_skip,
 	/* TODO: Take care of error handling. */
 	lseek(fout, sector_skip*512, SEEK_SET);
 	while(total_sectors < sector_count
-			&& (nbytes = read(fin, buf, sizeof(buf))) != EOF) {
-		if((nbytes = write(fout, buf, nbytes)) >= 0) {
-			total_bytes += nbytes;
-			total_sectors++;
-		}
+			&& (nbytes = read(fin, buf, sizeof(buf))) > 0) {
+		nbytes = write(fout, buf, nbytes);
+		total_bytes += nbytes;
+		if((total_bytes % 512) == 0) total_sectors++;
 	}
 	close(fin);
 	printf("Total bytes written: %d\n", total_bytes);
 	printf("Total sectors written: %d/%d\n", total_sectors, sector_count);
 	return 0;
 }
-/* Create file table.
+/* Write file table to disk.
+ */
+int write_table(const char *filename, struct file *table)
+{
+	int total_bytes = 0;
+	int fd;
+
+	errno = 0;
+	if((fd = open(filename, O_WRONLY | O_CREAT, 0644)) < 0) {
+		fprintf(stderr, "Error: %s\n", strerror(errno));
+		return 1;
+	}
+	total_bytes = write(fd, table, sizeof(struct file)*MAXFILES);
+	close(fd);
+	printf("File %s created totaling %d bytes.\n", filename, total_bytes);
+	return 0;
+}
+/* Program to create a simple file system.
  */
 int main(void)
 {
@@ -88,8 +108,9 @@ int main(void)
 		return 1;
 	}
 	write_file(fout, 0, 1, "boot.bin");
-/*	write_file(fout, 1, 1, "ftable.dat");*/
-	write_file(fout, 1, 5, "io.sys");
+	write_table("ftable.dat", ftable);
+	write_file(fout, 1, 1, "ftable.dat");
+	write_file(fout, 2, 5, "io.sys");
 	close(fout);
 	return 0;
 }
