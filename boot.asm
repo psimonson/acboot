@@ -16,7 +16,7 @@ _start:
 	mov ds, ax
 	mov es, ax
 	cli
-	mov bx, 0xffff
+	mov bx, 0x8000
 	mov ss, bx
 	mov sp, ax
 	sti
@@ -26,17 +26,13 @@ _start:
 	call print
 
 	; load some sectors from disk
-	mov byte [sector], 1
 	mov bx, word [root]
-	mov ax, 0
+	mov byte [sector], 1
+	mov byte [blocks], 1
 	call read_sectors
 
 	; load kernel
-	mov bx, 2
-	mul bx
-	mov word [kernel], ax
-
-	; calulate space for kernel
+	mov word [kernel], 0
 	call load_kernel
 	jmp 0x0000:0x0100
 	call reboot
@@ -71,10 +67,12 @@ load_kernel:
 	mov cl, byte [bx+2]
 	mov byte [sector], cl
 	mov bx, 0x0100
+	mov ax, word [kernel]
 .loop:
 	call read_sectors
 	inc byte [sector]
-	cmp byte [sector], ch
+	mov al, byte [blocks]
+	cmp byte [sector], al
 	jl .loop
 	mov si, done
 	call print
@@ -90,7 +88,7 @@ read_sectors:
 	push ax
 	push bx
 	push cx
-	mov ah, 02h
+	mov ah, 2
 	mov al, 1
 	mov ch, 0
 	mov cl, byte [sector]
