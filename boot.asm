@@ -6,6 +6,7 @@
 [section .text]
 global _start
 jmp short _start
+nop
 
 ; BPB here
 
@@ -15,28 +16,29 @@ _start:
 	mov ds, ax
 	mov es, ax
 	cli
-	mov ss, ax
-	mov sp, 0xffff
+	mov bx, 0xffff
+	mov ss, bx
+	mov sp, ax
 	sti
+	cld
 
 	mov si, loading
 	call print
 
 	; load some sectors from disk
-	mov bx, word [root]
-	mov ax, 512
 	mov byte [sector], 1
+	mov bx, word [root]
+	mov ax, 0
 	call read_sectors
 
 	; load kernel
-	mov ax, 512
-	mov bx, 3
+	mov bx, 2
 	mul bx
 	mov word [kernel], ax
+
+	; calulate space for kernel
 	call load_kernel
-	push 0x0000
-	push word [kernel]
-	retf
+	jmp 0x0000:0x0100
 	call reboot
 
 getc:
@@ -64,10 +66,16 @@ load_kernel:
 	jne .no_match
 .match:
 	xor cx, cx
+	mov ch, byte [bx+1]
+	mov byte [blocks], ch
 	mov cl, byte [bx+2]
 	mov byte [sector], cl
-	mov bx, word [kernel]
+	mov bx, 0x0100
+.loop:
 	call read_sectors
+	inc byte [sector]
+	cmp byte [sector], ch
+	jl .loop
 	mov si, done
 	call print
 	ret
@@ -116,20 +124,20 @@ reboot:
 	mov si, reboot_msg
 	call print
 	call getc
-	push 0xffff
-	push 0x0000
-	retf
+	xor ax, ax
+	int 19h
 
 ; data
 loading db "Loading system...",0ah,0dh,24h
 done db 0ah,0dh,"Done loading!",0ah,0dh,24h
-reboot_msg db "Press any key to reboot...",0ah,0dh,24h
+reboot_msg db "Press any key to try again...",0ah,0dh,24h
 error db "Disk read error.",0ah,0dh,24h
 crlf db 0ah,0dh,24h
 drive db 0
-root dw 0x0100
+root dw 0x1000
 kernel dw 0x0000
-sector db 0x00
+sector db 0
+blocks db 0
 progress db 2eh,24h
 fail db 0ah,0dh,"Disk read error :(",0ah,0dh,24h
 
