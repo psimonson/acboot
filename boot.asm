@@ -52,43 +52,48 @@ print:
 	ret
 
 load_kernel:
-	mov bx, word [root]
+	mov si, word [root]
 .next:
-	mov al, byte [bx]
+	mov al, byte [si]
 	cmp al, 2
 	jne .no_match
 .match:
-	xor ax, ax
-	xor cx, cx
-	mov al, byte [bx+2]
-	mov cl, byte [bx+1]
 	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
+	mov ax, word [si+3]
+	mov cx, word [si+1]
 	call read_sectors
 	mov si, done
 	call print
 	ret
 .no_match:
-	add bx, 16
+	add si, 16
 	jmp short .next
 
 lbachs:
 	; calculate sector
-	pusha
+	push bx
+	push ax
 	xor dx, dx
-	mov bx, word [SectorsPerTrack]
-	div bx
-	inc dx
-	mov word [absSector], dx
-	; calculate side/track (head/cylinder)
+	; sectors first
+	div word [SectorsPerTrack]
+	inc dl
+	mov byte [absSector], dl
 	xor dx, dx
-	mov bx, [NumHeads]
+	; now heads
+	div word [NumHeads]
+	mov byte [absHead], dl
+	; finally cylinders
+	mov ax, word [NumHeads]
+	mul word [SectorsPerTrack]
+	xor dx, dx
+	xchg bx, ax
+	pop ax
 	div bx
-	; save side/track
-	mov word [absTrack], ax
-	mov word [absHead], dx
-	popa
+	mov byte [absTrack], al
+	xor dx, dx
+	pop bx
 	ret
 
 read_sectors:

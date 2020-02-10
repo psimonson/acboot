@@ -18,12 +18,17 @@
 /* File table structure */
 struct file {
 	unsigned char id;
-	unsigned char num_sectors;
-	unsigned char start;
+	unsigned short num_sectors;
+	unsigned short start;
 	unsigned char _unused[3];
 	unsigned int _reserved;
-	unsigned short _reserved2;
 };
+/* Initialise ftable memory.
+ */
+void init_table(struct file *table)
+{
+	memset(table, 0, sizeof(struct file)*MAXFILES);
+}
 /* Initialise ftable entry.
  */
 void init_entry(struct file *entry, unsigned char id,
@@ -31,11 +36,8 @@ void init_entry(struct file *entry, unsigned char id,
 {
 	if(entry == NULL) return;
 	entry->id = id;
-	memset(entry->_unused, 0, 7);
 	entry->num_sectors = num_sectors;
 	entry->start = start;
-	entry->_reserved = 0;
-	entry->_reserved2 = 0;
 }
 /* Print binary table from entry.
  */
@@ -97,10 +99,9 @@ int write_table(const char *filename, struct file *table)
 int main(void)
 {
 	struct file ftable[MAXFILES];
-	int i, fout;
+	int fout;
 
-	for(i = 0; i < MAXFILES; i++)
-		init_entry(&ftable[i], 0, 0, 0);
+	init_table(ftable);
 	init_entry(&ftable[0], 0, 0, 1);
 	init_entry(&ftable[1], 1, 1, 2);
 	init_entry(&ftable[2], 2, 5, 3);
