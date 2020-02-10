@@ -24,14 +24,17 @@ _start:
 	call print
 
 	; load some sectors from disk
-	mov bx, word [root]
-	mov ax, 0
+	mov bx, 0x0200
+	mov word [root], bx
+	mov ax, 1
 	mov cx, 1
 	call read_sectors
 
 	; load kernel
 	call load_kernel
-	jmp 0x0000:0x0100
+	push 0x0100
+	push 0x0000
+	retf
 	call reboot
 
 getc:
@@ -58,11 +61,11 @@ load_kernel:
 	cmp al, 2
 	jne .no_match
 .match:
+	mov ax, 2 ; word [si+3]
+	mov cx, 5 ; word [si+1]
 	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
-	mov ax, word [si+3]
-	mov cx, word [si+1]
 	call read_sectors
 	mov si, done
 	call print
@@ -148,7 +151,7 @@ reboot_msg db "Press any key to try again...",0ah,0dh,24h
 error db "Disk read error.",0ah,0dh,24h
 crlf db 0ah,0dh,24h
 drive db 0
-root dw 0x0200
+root resw 1
 absTrack dw 0
 absSector dw 0
 absHead dw 0
