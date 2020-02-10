@@ -37,7 +37,8 @@ disk-clean:
 	rm -f floppy.img
 
 disk: disk-clean kernel
-	mkfs.msdos -C floppy.img 1440
+#	mkfs.msdos -C floppy.img 1440
+	dd if=/dev/zero of=floppy.img bs=512 count=2880
 	./ft
 #	dd if=boot.bin of=floppy.img bs=512 count=1 conv=notrunc
 #	dd if=io.sys of=floppy.img seek=1 bs=512 conv=notrunc
