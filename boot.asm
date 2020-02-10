@@ -3,12 +3,12 @@
 ; ===============================================================
 [bits 16]
 [org 0x7c00]
-[section .text]
-global _start
+
 jmp short _start
 nop
 
-; BPB here
+SectorsPerTrack db 18
+NumHeads db 2
 
 _start:
 	mov byte [drive], dl
@@ -16,23 +16,20 @@ _start:
 	mov ds, ax
 	mov es, ax
 	cli
-	mov bx, 0x8000
-	mov ss, bx
-	mov sp, ax
+	mov ss, ax
+	mov sp, 0x8000
 	sti
-	cld
 
 	mov si, loading
 	call print
 
 	; load some sectors from disk
 	mov bx, word [root]
-	mov byte [sector], 1
-	mov byte [blocks], 1
+	mov ax, 0
+	mov cx, 1
 	call read_sectors
 
 	; load kernel
-	mov word [kernel], 0
 	call load_kernel
 	jmp 0x0000:0x0100
 	call reboot
@@ -61,25 +58,38 @@ load_kernel:
 	cmp al, 2
 	jne .no_match
 .match:
+	xor ax, ax
 	xor cx, cx
-	mov ch, byte [bx+1]
-	mov byte [blocks], ch
-	mov cl, byte [bx+2]
-	mov byte [sector], cl
+	mov al, byte [bx+2]
+	mov cl, byte [bx+1]
 	mov bx, 0x0100
-	mov ax, word [kernel]
-.loop:
+	mov es, bx
+	xor bx, bx
 	call read_sectors
-	inc byte [sector]
-	mov al, byte [blocks]
-	cmp byte [sector], al
-	jl .loop
 	mov si, done
 	call print
 	ret
 .no_match:
 	add bx, 16
 	jmp short .next
+
+lbachs:
+	; calculate sector
+	pusha
+	xor dx, dx
+	mov bx, word [SectorsPerTrack]
+	div bx
+	inc dx
+	mov word [absSector], dx
+	; calculate side/track (head/cylinder)
+	xor dx, dx
+	mov bx, [NumHeads]
+	div bx
+	; save side/track
+	mov word [absTrack], ax
+	mov word [absHead], dx
+	popa
+	ret
 
 read_sectors:
 .main:
@@ -88,11 +98,12 @@ read_sectors:
 	push ax
 	push bx
 	push cx
+	call lbachs
 	mov ah, 2
 	mov al, 1
-	mov ch, 0
-	mov cl, byte [sector]
-	mov dh, 0
+	mov ch, byte [absTrack]
+	mov cl, byte [absSector]
+	mov dh, byte [absHead]
 	mov dl, byte [drive]
 	int 13h
 	jnc .success
@@ -113,7 +124,7 @@ read_sectors:
 	pop cx
 	pop bx
 	pop ax
-	add bx, 0x200
+	add bx, 512
 	inc ax
 	loop .main
 	ret
@@ -132,10 +143,10 @@ reboot_msg db "Press any key to try again...",0ah,0dh,24h
 error db "Disk read error.",0ah,0dh,24h
 crlf db 0ah,0dh,24h
 drive db 0
-root dw 0x1000
-kernel dw 0x0000
-sector db 0
-blocks db 0
+root dw 0x0200
+absTrack dw 0
+absSector dw 0
+absHead dw 0
 progress db 2eh,24h
 fail db 0ah,0dh,"Disk read error :(",0ah,0dh,24h
 
