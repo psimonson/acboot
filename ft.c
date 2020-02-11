@@ -102,9 +102,9 @@ int main(void)
 	int fout;
 
 	init_table(ftable);
-	init_entry(&ftable[0], 0, 0, 1);
-	init_entry(&ftable[1], 1, 1, 2);
-	init_entry(&ftable[2], 2, 5, 3);
+	init_entry(&ftable[0], 1, 1, 0);
+	init_entry(&ftable[1], 2, 1, 1);
+	init_entry(&ftable[2], 3, 5, 2);
 	errno = 0;
 	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));

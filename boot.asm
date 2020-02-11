@@ -24,8 +24,7 @@ _start:
 	call print
 
 	; load some sectors from disk
-	mov bx, 0x0200
-	mov word [root], bx
+	mov bx, word [root]
 	mov ax, 1
 	mov cx, 1
 	call read_sectors
@@ -58,11 +57,11 @@ load_kernel:
 	mov si, word [root]
 .next:
 	mov al, byte [si]
-	cmp al, 2
+	cmp al, 3
 	jne .no_match
 .match:
-	mov ax, 2 ; word [si+3]
-	mov cx, 5 ; word [si+1]
+	mov ax, word [si+4]
+	mov cx, word [si+2]
 	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
@@ -145,13 +144,13 @@ reboot:
 	int 19h
 
 ; data
-loading db "Loading system...",0ah,0dh,24h
+loading db "Loading system",24h
 done db 0ah,0dh,"Done loading!",0ah,0dh,24h
 reboot_msg db "Press any key to try again...",0ah,0dh,24h
 error db "Disk read error.",0ah,0dh,24h
 crlf db 0ah,0dh,24h
 drive db 0
-root resw 1
+root dw 0x0200
 absTrack dw 0
 absSector dw 0
 absHead dw 0
