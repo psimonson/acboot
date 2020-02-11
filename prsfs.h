@@ -6,8 +6,8 @@
  *************************************************************
  */
 
-#ifndef PRSFS_H
-#define PRSFS_H
+#ifndef _PRSFS_H_
+#define _PRSFS_H_
 
 /* Maximum files that can be stored */
 #define MAXFILES 32

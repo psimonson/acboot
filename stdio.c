@@ -14,7 +14,7 @@ asm(".code16gcc");
 
 /* Timer for waiting inside of code.
  */
-void timer(unsigned short high, unsigned short low)
+__REGPARM void timer(unsigned short high, unsigned short low)
 {
 	asm volatile(
 		"int $0x15"
@@ -24,7 +24,7 @@ void timer(unsigned short high, unsigned short low)
 }
 /* Output val to port.
  */
-void outb(unsigned short port, unsigned char val)
+__REGPARM void outb(unsigned short port, unsigned char val)
 {
 	asm volatile(
 		"out %0, %1\n"
@@ -34,7 +34,7 @@ void outb(unsigned short port, unsigned char val)
 }
 /* Return val from port.
  */
-unsigned char inb(unsigned short port)
+__REGPARM unsigned char inb(unsigned short port)
 {
 	unsigned short output = 0;
 	asm volatile(
@@ -46,7 +46,7 @@ unsigned char inb(unsigned short port)
 }
 /* Get character from keyboard.
  */
-int getc(void)
+__REGPARM int getc(void)
 {
 	unsigned char ch = 0;
 	asm("int $0x16\nmov %%al, %0" : "=m"(ch) : "a"(0x0000));
@@ -54,7 +54,7 @@ int getc(void)
 }
 /* Put character to screen.
  */
-void putc(int c)
+__REGPARM void putc(int c)
 {
 	asm volatile(
 		"int $0x10" : : "a"(0x0e00 | (c & 0x000000ff)),

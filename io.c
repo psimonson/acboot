@@ -10,6 +10,7 @@ asm(".code16gcc");
 asm("jmpl $0x0000, $main");
 
 #include "stdio.h"
+#include "attr.h"
 
 unsigned char bios_drive = -1;
 /* Entry point for boot program.
