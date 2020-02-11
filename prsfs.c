@@ -75,19 +75,17 @@ int write_file(int fout, unsigned char sector_skip,
 }
 /* Write file table to disk.
  */
-int write_table(const char *filename, struct file *table)
+int write_table(int fout, struct file *table)
 {
 	int total_bytes = 0;
-	int fd;
 
 	errno = 0;
-	if((fd = open(filename, O_WRONLY | O_CREAT, 0644)) < 0) {
+	total_bytes = write(fout, table, sizeof(struct file)*MAXFILES);
+	if(errno != 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));
 		return 1;
 	}
-	total_bytes = write(fd, table, sizeof(struct file)*MAXFILES);
-	close(fd);
-	printf("File %s created totaling %d bytes.\n", filename, total_bytes);
+	printf("Table written totaling %d bytes.\n", total_bytes);
 	printf("Size of table struct is %lu.\n", sizeof(struct file));
 	return 0;
 }

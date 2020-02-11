@@ -16,6 +16,7 @@ __REGPARM void outb(unsigned short port, unsigned char val);
 __REGPARM unsigned char inb(unsigned short port);
 __REGPARM int getc(void);
 __REGPARM void putc(int c);
+__REGPARM int kbhit(void);
 int isspace(int c);
 void beep(unsigned short freq, unsigned short high, unsigned short low);
 void _type(const char *s, unsigned short freq, unsigned short high,

@@ -18,6 +18,8 @@ unsigned char bios_drive = -1;
 void main(void)
 {
 	char buf[32];
+	int i;
+
 	unsigned short drive = -1;
 	asm volatile("" : "=d"(drive));
 	bios_drive = drive & 0x00ff;
@@ -26,7 +28,13 @@ void main(void)
 	printf("Hello, %s!\r\n", buf);
 	printf("BIOS drive: %d\r\n", bios_drive);
 	type("Press any key to reboot...\r\n");
-	(void)getc();
+
+	i = 0;
+	while(kbhit() == 0) {
+		printf("Hello world: %d\r\n", i);
+		timer(0x0007, 0x05f0);
+		i++;
+	}
 	asm volatile(
 		"jmpl $0xffff, $0x0000"
 	);

@@ -61,6 +61,16 @@ __REGPARM void putc(int c)
 		"b"(0x0007), "c"(0x0001)
 	);
 }
+/* Check for keypress from keyboard.
+ */
+__REGPARM int kbhit(void)
+{
+	unsigned char ch = 0;
+	asm volatile(
+		"int $0x16; mov %%al, %0" : "=m"(ch) : "a"(0x0100)
+	);
+	return ch;
+}
 /* Check if character is whitespace.
  */
 int isspace(int c)
