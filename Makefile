@@ -26,7 +26,7 @@ io.sys: io.elf
 boot.bin: boot.asm
 	nasm -f bin -o $@ $^
 
-ft: ft.c.o
+ft: ft.c.o prsfs.c.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 kernel:

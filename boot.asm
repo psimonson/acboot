@@ -87,19 +87,20 @@ load_kernel:
 	mov bx, word [root]
 	xor cx, cx
 .next:
-	mov al, [bx]
+	mov al, byte [bx]
 	cmp al, 0xf7
 	je .no_match
 	cmp al, 0x0
 	je .error
 	mov si, kernel
 	mov di, bx
-	mov cx, 6
+	mov cx, 11
 	rep cmpsb
 	jne .no_match
 .match:
-	mov ax, word [bx+10]
-	mov cx, word [bx+8]
+	xor ax, ax
+	mov al, byte [bx+14]
+	mov cx, word [bx+12]
 	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
@@ -191,7 +192,7 @@ reboot_msg db "Press any key to try again...",0ah,0dh,24h
 error db "Disk read error.",0ah,0dh,24h
 crlf db 0ah,0dh,24h
 drive db 0
-kernel db "IO   SYS"
+kernel db "IO      SYS"
 root dw 0x0200
 absTrack dw 0
 absSector dw 0
