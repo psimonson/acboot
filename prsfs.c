@@ -27,7 +27,7 @@ void init_table(struct file *table)
 /* Initialise ftable entry.
  */
 void init_entry(struct file *entry, const char *filename,
-	unsigned short num_sectors, unsigned char start)
+	unsigned short num_sectors, unsigned short start)
 {
 	if(entry == NULL) return;
 	memcpy(entry->filename, filename, 11);

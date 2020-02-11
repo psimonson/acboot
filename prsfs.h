@@ -15,11 +15,12 @@
 struct file {
 	unsigned char filename[11];
 	unsigned short num_sectors;
-	unsigned char start;
-};
+	unsigned short start;
+	unsigned char _reserved;
+} __attribute((packed));
 void init_table(struct file *table);
 void init_entry(struct file *entry, const char *filename,
-	unsigned short num_sectors, unsigned char start);
+	unsigned short num_sectors, unsigned short start);
 void print_entry(struct file *entry);
 int write_file(int fout, unsigned char sector_skip,
 	unsigned char sector_count, const char *filename);
