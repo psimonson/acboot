@@ -1,4 +1,6 @@
-; simple boot sector to load next sectors of floppy disk.
+; ===============================================================
+; Simple boot sector to load sectors of floppy disk.
+; Date created 02/07/2020
 ; by Philip R. Simonson
 ; ===============================================================
 [bits 16]
