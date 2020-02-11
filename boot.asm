@@ -57,9 +57,13 @@ _start:
 
 	; load kernel
 	call load_kernel
+	cmp dx, 1
+	je .error
 	push 0x0100
 	push 0x0000
 	retf
+
+.error:
 	call reboot
 
 getc:
@@ -80,14 +84,22 @@ print:
 	ret
 
 load_kernel:
-	mov si, word [root]
+	mov bx, word [root]
+	xor cx, cx
 .next:
-	mov al, byte [si]
-	cmp al, 3
+	mov al, [bx]
+	cmp al, 0xf7
+	je .no_match
+	cmp al, 0x0
+	je .error
+	mov si, kernel
+	mov di, bx
+	mov cx, 6
+	rep cmpsb
 	jne .no_match
 .match:
-	mov ax, word [si+4]
-	mov cx, word [si+2]
+	mov ax, word [bx+10]
+	mov cx, word [bx+8]
 	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
@@ -96,8 +108,11 @@ load_kernel:
 	call print
 	ret
 .no_match:
-	add si, 16
+	add bx, 16
 	jmp short .next
+.error:
+	mov dx, 1
+	ret
 
 lbachs:
 	; calculate sector
@@ -176,6 +191,7 @@ reboot_msg db "Press any key to try again...",0ah,0dh,24h
 error db "Disk read error.",0ah,0dh,24h
 crlf db 0ah,0dh,24h
 drive db 0
+kernel db "IO   SYS"
 root dw 0x0200
 absTrack dw 0
 absSector dw 0

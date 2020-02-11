@@ -17,10 +17,9 @@
 #define MAXFILES 32
 /* File table structure */
 struct file {
-	unsigned char id;
+	unsigned char filename[8];
 	unsigned short num_sectors;
 	unsigned short start;
-	unsigned char _unused[3];
 	unsigned int _reserved;
 };
 /* Initialise ftable memory.
@@ -31,20 +30,22 @@ void init_table(struct file *table)
 }
 /* Initialise ftable entry.
  */
-void init_entry(struct file *entry, unsigned char id,
+void init_entry(struct file *entry, const char *filename,
 	unsigned char num_sectors, unsigned char start)
 {
 	if(entry == NULL) return;
-	entry->id = id;
+	memcpy(entry->filename, filename, 8);
 	entry->num_sectors = num_sectors;
 	entry->start = start;
+	entry->_reserved = 0;
 }
 /* Print binary table from entry.
  */
 void print_entry(struct file *entry)
 {
 	if(entry == NULL) return;
-	printf("================ Entry #%d ======================\n", entry->id);
+	printf("================ Entry [%s] ======================\n",
+		entry->filename);
 	write(STDOUT_FILENO, entry, sizeof(struct file));
 	printf("\n=================================================\n");
 }
@@ -67,9 +68,10 @@ int write_file(int fout, unsigned char sector_skip,
 	lseek(fout, sector_skip*512, SEEK_SET);
 	while(total_sectors < sector_count
 			&& (nbytes = read(fin, buf, sizeof(buf))) > 0) {
-		nbytes = write(fout, buf, nbytes);
-		total_bytes += nbytes;
-		if((total_bytes % 512) == 0) total_sectors++;
+		if((nbytes = write(fout, buf, nbytes)) >= 0) {
+			total_bytes += nbytes;
+			total_sectors++;
+		}
 	}
 	close(fin);
 	printf("Total bytes written: %d\n", total_bytes);
@@ -102,9 +104,8 @@ int main(void)
 	int fout;
 
 	init_table(ftable);
-	init_entry(&ftable[0], 1, 1, 0);
-	init_entry(&ftable[1], 2, 1, 1);
-	init_entry(&ftable[2], 3, 5, 2);
+	init_entry(&ftable[0], "IO   SYS", 5, 2);
+	init_entry(&ftable[1], "\xf7       ", 0, 0);
 	errno = 0;
 	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));
