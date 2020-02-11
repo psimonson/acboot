@@ -47,4 +47,4 @@ run: disk
 	qemu-system-i386 -fda floppy.img -boot a -soundhw pcspk
 
 clean: disk-clean
-	rm -f *.o ftable.dat ft io.elf io.sys boot.bin
+	rm -f *.o ft io.elf io.sys boot.bin
