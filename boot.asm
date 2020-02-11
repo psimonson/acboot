@@ -17,9 +17,33 @@ _start:
 	mov es, ax
 	cli
 	mov ss, ax
-	mov sp, 0x8000
+	mov sp, 0xffff
 	sti
 
+	; check if it's an 8086/80186/80286/80386
+	mov cx, 0121h
+	shl ch, cl
+	jz .not_386 ; it's 8086
+	push sp
+	pop ax
+	cmp ax, sp
+	jne .not_386 ; it's 80186
+	mov ax, 7000h
+	push ax
+	popf
+	pushf
+	pop ax
+	and ax, 7000h
+	cmp ax, 7000h
+	je .system ; it's 386
+
+.not_386:
+	; cpu is 286 or lower
+	mov si, not_supported
+	call print
+	call reboot
+
+.system:
 	mov si, loading
 	call print
 
@@ -156,6 +180,7 @@ absSector dw 0
 absHead dw 0
 progress db 2eh,24h
 fail db 0ah,0dh,"Disk read error :(",0ah,0dh,24h
+not_supported db "You need atleast a 80386 processor.",0ah,0dh,24h
 
 times 510-($-$$) db 0
 dw 0xaa55
