@@ -9,7 +9,7 @@ endif
 
 .PHONY: all disk kernel run clean disk-clean
 ifeq ($(KERNEL),yes)
-all: boot.bin io.sys
+all: boot.bin io.sys binary.app
 else
 all: ft
 endif
@@ -26,6 +26,9 @@ io.sys: io.elf
 boot.bin: boot.asm
 	nasm -f bin -o $@ $^
 
+binary.app: binary.asm
+	nasm -f bin -o $@ $^
+
 ft: ft.c.o prsfs.c.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
@@ -37,14 +40,11 @@ disk-clean:
 	rm -f floppy.img
 
 disk: disk-clean kernel
-#	mkfs.msdos -C floppy.img 1440
 	dd if=/dev/zero of=floppy.img bs=512 count=2880
 	./ft
-#	dd if=boot.bin of=floppy.img bs=512 count=1 conv=notrunc
-#	dd if=io.sys of=floppy.img seek=1 bs=512 conv=notrunc
 
 run: disk
 	qemu-system-i386 -fda floppy.img -boot a -soundhw pcspk
 
 clean: disk-clean
-	rm -f *.o ft io.elf io.sys boot.bin
+	rm -f *.o ft binary.app io.elf io.sys boot.bin

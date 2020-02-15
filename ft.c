@@ -26,6 +26,7 @@ int main(void)
 
 	init_table(ftable);
 	init_entry(&ftable[0], "IO      SYS", TOTAL_SECTORS, START_SECTOR);
+	init_entry(&ftable[1], "BINARY  APP", 1, START_SECTOR+(TOTAL_SECTORS+1));
 	errno = 0;
 	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));
@@ -34,6 +35,7 @@ int main(void)
 	write_file(fout, 0, 1, "boot.bin");
 	write_table(fout, ftable);
 	write_file(fout, START_SECTOR, TOTAL_SECTORS, "io.sys");
+	write_file(fout, START_SECTOR+(TOTAL_SECTORS+1), 1, "binary.app");
 	close(fout);
 	return 0;
 }

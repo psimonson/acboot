@@ -14,7 +14,14 @@ _start:
 	call print
 	xor ax, ax
 	int 16h
-	jmp 0x1000:0x0000
+
+	; reset segments and jump back to IO.SYS
+	pop ax
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	jmp 0x0100:0x0000
 
 print:
 	mov si, dx

@@ -20,20 +20,25 @@ void main(void)
 	unsigned char drive = -1;
 	drive_params_t p;
 	char buf[32];
-	void *ftable;
+	void *table;
 	int i;
 
 	asm volatile("" : "=d"(drive));
 	setup();
 	get_drive_params(drive, &p);
 	printf("BIOS drive: %d\r\n", p.drive);
-	if((ftable = get_ftable(&p)) != NULL) {
-		printf("FILE: ");
-		for(i = 0; i < 11; i++)
-			putc(((struct file*)ftable)->filename[i]);
-		printf("\r\nSector Count: %d\r\nStarting Sector: %d\r\n",
-			((struct file*)ftable)->num_sectors,
-			((struct file*)ftable)->start);
+	if((table = get_ftable(&p)) != NULL) {
+		for(i = 0; i < 2; i++) {
+			void *ftable = &table[i*16];
+			int j;
+
+			printf("FILE: ");
+			for(j = 0; j < 11; j++)
+				putc(((struct file*)ftable)->filename[j]);
+			printf("\r\nSector Count: %d\r\nStarting Sector: %d\r\n",
+				((struct file*)ftable)->num_sectors,
+				((struct file*)ftable)->start);
+		}
 	}
 	printf("Please enter your name: ");
 	gets(buf, sizeof(buf));
