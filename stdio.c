@@ -226,3 +226,20 @@ void gets(char *s, int size)
 	printf("\r\n");
 	*s = '\0';
 }
+/* Compare memory against each other to see if they're equal.
+ */
+int memcpy(const void *s, const void *t, int size)
+{
+	const unsigned char *p1, *p2;
+	int i;
+
+	p1 = (const unsigned char *)s;
+	p2 = (const unsigned char *)t;
+	for(i = 0; i < size; i++) {
+		if(p1[i] < p2[i])
+			return -1;
+		else if(p1[i] > p2[i])
+			return 1;
+	}
+	return 0;
+}

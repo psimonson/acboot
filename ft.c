@@ -15,7 +15,7 @@
 #include "prsfs.h"
 
 #define START_SECTOR  2		/* starting sector of operating system */
-#define TOTAL_SECTORS 9		/* total operating system sectors */
+#define TOTAL_SECTORS 10	/* total operating system sectors */
 
 /* Program to create a simple file system.
  */

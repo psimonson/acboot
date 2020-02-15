@@ -12,6 +12,7 @@ asm("jmpl $0, $main");
 #include "stdio.h"
 #include "types.h"
 #include "disk.h"
+#include "fs.h"
 
 /* Entry point for boot program.
  */
@@ -43,6 +44,12 @@ void main(void)
 	printf("Please enter your name: ");
 	gets(buf, sizeof(buf));
 	printf("Hello, %s!\r\n", buf);
+	printf("Please enter a file name: ");
+	gets(buf, sizeof(buf));
+	if(search_file(table, buf) != NULL)
+		printf("File: %s Found.\r\n", buf);
+	else
+		printf("File: %s Not found.\r\n");
 	type("Press any key to reboot...\r\n");
 
 	i = 0;

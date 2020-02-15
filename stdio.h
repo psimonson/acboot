@@ -29,5 +29,6 @@ void itoa(int n, char *s, int size);
 void print(const char *data, int len);
 int printf(const char *fmt, ...);
 void gets(char *s, int size);
+int memcpy(const void *s, const void *t, int size);
 
 #endif
