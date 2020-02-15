@@ -14,7 +14,7 @@ NumHeads db 2
 
 _start:
 	mov byte [drive], dl
-	xor ax, ax
+	mov ax, cs
 	mov ds, ax
 	mov es, ax
 	cli

@@ -14,15 +14,19 @@ asm(".code16gcc");
  */
 int __REGPARM get_drive_params(const unsigned char drive, drive_params_t *p)
 {
-	unsigned short failed = 0;
+	unsigned char failed = 0;
 	unsigned short tmp1, tmp2;
 
 	asm volatile(
-		"movw $0, %0\n"
+		"push %%bx\n"
+		"push %%es\n"
+		"mov $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		: "=m"(failed), "=c"(tmp1), "=d"(tmp2)
-		: "a"(0x0800), "d"(drive), "D"(0)
+		"pop %%es\n"
+		"pop %%bx\n"
+		: "=r"(failed), "=c"(tmp1), "=d"(tmp2)
+		: "a"(0x0800), "d"(0x0000 | drive), "D"(0)
 		: "cc", "bx"
 	);
 
@@ -41,21 +45,24 @@ int __REGPARM read_disk(const void *buffer, const drive_params_t *p,
 	unsigned short status = 0;
 	unsigned char failed = 0;
 	unsigned char c, h, s;
-	unsigned short t;
 
 	/* LBA to CHS value */
-	c = lba / (p->numh * p->spt);
-	t = lba % (p->numh * p->spt);
-	h = t / p->spt;
-	s = (t % p->spt) + 1;
+	s = (lba % p->spt) + 1;
+	c = (lba / p->spt) / p->numh;
+	h = (lba / p->spt) % p->numh;
 
 	asm volatile(
-		"movw $0, %0\n"
+		"push %%bx\n"
+		"push %%es\n"
+		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		: "=m"(failed), "=a"(status)
+		"pop %%es\n"
+		"pop %%bx\n"
+		: "=r"(failed), "=a"(status)
 		: "a"(0x0200 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)
+		: "cc"
 	);
 
 	if(failed)
