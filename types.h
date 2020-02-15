@@ -13,7 +13,8 @@
 #define MAXFILES 32
 /* File table structure */
 struct file {
-	unsigned char filename[11];
+	unsigned char filename[8];
+	unsigned char extension[3];
 	unsigned short num_sectors;
 	unsigned short start;
 	unsigned char _reserved;
