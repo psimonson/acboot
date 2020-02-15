@@ -12,20 +12,7 @@ asm("jmpl $0, $main");
 #include "stdio.h"
 #include "types.h"
 #include "disk.h"
-#include "attr.h"
 
-__REGPARM void *get_ftable(drive_params_t *p)
-{
-	static unsigned char sector[BLOCK_SIZE];
-/*	asm volatile(
-		"mov $0x1000, %bx\n"
-		"mov %bx, %es\n"
-		"xor %bx, %bx\n"
-	);
-*/	if(read_disk(sector, p, 1, 1))
-		return sector;
-	return NULL;
-}
 /* Entry point for boot program.
  */
 void main(void)
@@ -37,13 +24,7 @@ void main(void)
 	int i;
 
 	asm volatile("" : "=d"(drive));
-	asm volatile(
-		"mov $0x0000, %ax\n"
-		"mov %ax, %ds\n"
-		"mov %ax, %es\n"
-		"mov %ax, %fs\n"
-		"mov %ax, %gs\n"
-	);
+	setup();
 	get_drive_params(drive, &p);
 	printf("BIOS drive: %d\r\n", p.drive);
 	if((ftable = get_ftable(&p)) != NULL) {

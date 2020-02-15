@@ -11,6 +11,7 @@
 
 #include "attr.h"
 
+__REGPARM void setup(void);
 __REGPARM void timer(unsigned short high, unsigned short low);
 __REGPARM void outb(unsigned short port, unsigned char val);
 __REGPARM unsigned char inb(unsigned short port);

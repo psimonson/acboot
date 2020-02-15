@@ -12,6 +12,18 @@ asm(".code16gcc");
 #include <stdarg.h>
 #include "stdio.h"
 
+/* Setup segment registers for my simple operating system.
+ */
+__REGPARM void setup(void)
+{
+	asm volatile(
+		"mov $0x0000, %ax\n"
+		"mov %ax, %ds\n"
+		"mov %ax, %es\n"
+		"mov %ax, %fs\n"
+		"mov %ax, %gs\n"
+	);
+}
 /* Timer for waiting inside of code.
  */
 __REGPARM void timer(unsigned short high, unsigned short low)

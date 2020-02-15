@@ -12,7 +12,7 @@ asm(".code16gcc");
 
 /* Get drive parameters from BIOS.
  */
-int __REGPARM get_drive_params(const unsigned char drive, drive_params_t *p)
+__REGPARM int get_drive_params(const unsigned char drive, drive_params_t *p)
 {
 	unsigned char failed = 0;
 	unsigned short tmp1, tmp2;
@@ -37,9 +37,23 @@ int __REGPARM get_drive_params(const unsigned char drive, drive_params_t *p)
 	p->numh = tmp2 >> 8;
 	return failed;
 }
+/* Reset disk drive.
+ */
+__REGPARM int reset_disk(const drive_params_t *p)
+{
+	unsigned char failed = 0;
+	asm volatile(
+		"int $0x13\n"
+		"setcb %0\n"
+		: "=r"(failed)
+		: "a"(0x0000), "d"(0x0000 | p->drive)
+		: "cc"
+	);
+	return !failed;
+}
 /* Raw read from disk drive.
  */
-int __REGPARM read_disk(const void *buffer, const drive_params_t *p,
+__REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 	unsigned int lba, unsigned char blocks)
 {
 	unsigned short status = 0;
@@ -71,7 +85,18 @@ int __REGPARM read_disk(const void *buffer, const drive_params_t *p,
 }
 /* Raw write to disk drive.
  */
-void __REGPARM write_disk(const unsigned char drive)
+__REGPARM void write_disk(const unsigned char drive)
 {
 	/* TODO: Implement raw write. */
+}
+/* Get my file system table from disk.
+ */
+__REGPARM void *get_ftable(drive_params_t *p)
+{
+	static unsigned char sector[BLOCK_SIZE];
+	reset_disk(p);
+	if(read_disk(sector, p, 1, 1) == 1)
+		return sector;
+	reset_disk(p);
+	return NULL;
 }

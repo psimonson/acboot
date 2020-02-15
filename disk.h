@@ -22,11 +22,15 @@ struct drive_params {
 } __PACKED;
 typedef struct drive_params drive_params_t;
 /* get drive parameters from BIOS */
-int __REGPARM get_drive_params(const unsigned char drive, drive_params_t *p);
+__REGPARM int get_drive_params(const unsigned char drive, drive_params_t *p);
+/* reset disk drive */
+__REGPARM int reset_disk(const drive_params_t *p);
 /* raw read drive from LBA */
-int __REGPARM read_disk(const void *buffer, const drive_params_t *p,
+__REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 	unsigned int lba, unsigned char blocks);
 /* raw write drive from LBA */
-void __REGPARM write_disk(const unsigned char drive);
+__REGPARM void write_disk(const unsigned char drive);
+/* read my file system table from disk */
+__REGPARM void *get_ftable(drive_params_t *p);
 
 #endif
