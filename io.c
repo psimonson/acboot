@@ -18,9 +18,9 @@ asm("jmpl $0, $main");
 void main(void)
 {
 	unsigned char drive = -1;
+	unsigned char *table;
 	drive_params_t p;
 	char buf[32];
-	void *table;
 	int i;
 
 	asm volatile("" : "=d"(drive));
