@@ -19,5 +19,6 @@ void print_entry(struct file *entry);
 int write_file(int fout, unsigned char sector_skip,
 	unsigned char sector_count, const char *filename);
 int write_table(int fout, struct file *table);
+unsigned char *get_entry(unsigned char drive);
 
 #endif

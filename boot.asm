@@ -59,9 +59,7 @@ _start:
 	call load_kernel
 	cmp dx, 1
 	je .error
-	push 0x0100
-	push 0x0000
-	retf
+	jmp 0x0100:0x0000
 
 .error:
 	call reboot

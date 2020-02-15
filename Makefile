@@ -17,7 +17,7 @@ endif
 %.c.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-io.elf: io.c.o stdio.c.o
+io.elf: io.c.o stdio.c.o disk.c.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
 io.sys: io.elf

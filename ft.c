@@ -14,6 +14,9 @@
 #include <fcntl.h>
 #include "prsfs.h"
 
+#define START_SECTOR  2		/* starting sector of operating system */
+#define TOTAL_SECTORS 7		/* total operating system sectors */
+
 /* Program to create a simple file system.
  */
 int main(void)
@@ -22,7 +25,7 @@ int main(void)
 	int fout;
 
 	init_table(ftable);
-	init_entry(&ftable[0], "IO      SYS", 6, 2);
+	init_entry(&ftable[0], "IO      SYS", TOTAL_SECTORS, START_SECTOR);
 	errno = 0;
 	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));
@@ -30,7 +33,7 @@ int main(void)
 	}
 	write_file(fout, 0, 1, "boot.bin");
 	write_table(fout, ftable);
-	write_file(fout, 2, 6, "io.sys");
+	write_file(fout, START_SECTOR, TOTAL_SECTORS, "io.sys");
 	close(fout);
 	return 0;
 }

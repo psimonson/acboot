@@ -7,26 +7,35 @@
  */
 
 asm(".code16gcc");
-asm("jmpl $0x0000, $main");
+asm("jmpl $0, $main");
 
 #include "stdio.h"
+#include "types.h"
+#include "disk.h"
 #include "attr.h"
+	unsigned char sector[BLOCK_SIZE];
 
-unsigned char bios_drive = -1;
 /* Entry point for boot program.
  */
 void main(void)
 {
+	unsigned char drive = -1;
+	drive_params_t p;
 	char buf[32];
 	int i;
 
-	unsigned short drive = -1;
 	asm volatile("" : "=d"(drive));
-	bios_drive = drive & 0x00ff;
+	get_drive_params(drive, &p);
+	printf("BIOS drive: %d\r\n", p.drive);
+	if(read_disk(sector, &p, 1, 1)) {
+		printf("FILE: ");
+		for(i = 0; i < 11; i++)
+			putc(((struct file*)sector)->filename[i]);
+		printf("\r\n");
+	}
 	printf("Please enter your name: ");
 	gets(buf, sizeof(buf));
 	printf("Hello, %s!\r\n", buf);
-	printf("BIOS drive: %d\r\n", bios_drive);
 	type("Press any key to reboot...\r\n");
 
 	i = 0;
