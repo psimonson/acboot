@@ -28,7 +28,7 @@ void main(void)
 	get_drive_params(drive, &p);
 	printf("BIOS drive: %d\r\n", p.drive);
 	if((table = get_ftable(&p)) != NULL) {
-		if((entry = search_file(table, "BINARY  APP")) != NULL)
+		if((entry = search_file(table, "SHELL   APP")) != NULL)
 			exec_file(&p, entry);
 		else
 			printf("File: %s Not found.\r\n");
