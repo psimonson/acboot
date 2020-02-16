@@ -87,9 +87,6 @@ int exec_cmd(const char *cmd)
 		if(strcmp(commands[i].cmd, cmd) == 0)
 			return commands[i].func();
 
-	printf("Total commands: %d\r\n", _total_commands);
-	for(i = 0; i < _total_commands; i++)
-		printf("Command: %s\r\n", commands[i].cmd);
 	printf("Bad command or filename.\r\n");
 	return 0;
 }
