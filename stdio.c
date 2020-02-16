@@ -264,7 +264,7 @@ int gets(char s[], int size)
 }
 /* Compare memory against each other to see if they're equal.
  */
-int memcpy(const void *s, const void *t, int size)
+int memcmp(const void *s, const void *t, int size)
 {
 	const unsigned char *p1, *p2;
 	int i;
@@ -278,4 +278,31 @@ int memcpy(const void *s, const void *t, int size)
 			return 1;
 	}
 	return 0;
+}
+/* Set memory block to a value.
+ */
+void *memset(void *p, int value, int size)
+{
+	unsigned char *buf = (unsigned char *)p;
+	int i;
+	for(i = 0; i < size; i++)
+		buf[i] = (unsigned char)value;
+	return p;
+}
+/* Copy memory from one place to another.
+ */
+void *memcpy(void *dstp, const void *srcp, int size)
+{
+	unsigned char *dst = (unsigned char *)dstp;
+	const unsigned char *src = (const unsigned char *)srcp;
+	int i;
+	for(i = 0; i < size; i++)
+		dst[i] = src[i];
+	return dstp;
+}
+/* Compare two strings together.
+ */
+int strcmp(const char *s, const char *t)
+{
+	return memcmp(s, t, strlen(t));
 }

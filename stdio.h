@@ -31,6 +31,9 @@ void itoa(int n, char *s, int size);
 void print(const char *data, int len);
 int printf(const char *fmt, ...);
 int gets(char s[], int size);
-int memcpy(const void *s, const void *t, int size);
+int memcmp(const void *s, const void *t, int size);
+void *memset(void *bufp, int value, int size);
+void *memcpy(void *dstp, const void *srcp, int size);
+int strcmp(const char *s, const char *t);
 
 #endif

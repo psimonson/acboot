@@ -22,7 +22,7 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 
 	for(i = 0; i < MAXFILES; i++) {
 		entry = (struct file *)&ftable[i*16];
-		if(memcpy(entry->filename, filename, 11) == 0)
+		if(memcmp(entry->filename, filename, 11) == 0)
 			return entry;
 	}
 	return NULL;
