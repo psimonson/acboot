@@ -21,7 +21,7 @@
 #define IO_SECTORS	10		/* total operating system sectors */
 /* some defines for binary app */
 #define BINARY_START (IO_START+(IO_SECTORS+1))
-#define BINARY_SECTORS 6
+#define BINARY_SECTORS 10
 /* Program to create a simple file system.
  */
 int main(void)

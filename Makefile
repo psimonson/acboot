@@ -4,7 +4,7 @@ LDFLAGS=
 KERNEL=no
 ifeq ($(KERNEL),yes)
 CFLAGS+=-m32 -fno-builtin -nostdlib -ffreestanding -fno-stack-protector
-LDFLAGS=-melf_i386 -T link.ld
+LDFLAGS=-m elf_i386
 endif
 
 .PHONY: all disk kernel run clean disk-clean
@@ -18,10 +18,10 @@ endif
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 io.elf: io.c.o stdio.c.o disk.c.o fs.c.o
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
 
-binary.elf: binary.c.o stdio.c.o
-	$(LD) $(LDFLAGS) -o $@ $^
+binary.elf: binary.c.o stdio.c.o disk.c.o
+	$(LD) $(LDFLAGS) -T binary.ld -o $@ $^
 
 IO.SYS: io.elf
 	objcopy -O binary $^ $@

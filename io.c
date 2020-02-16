@@ -20,6 +20,7 @@ void main(void)
 {
 	unsigned char drive = -1;
 	unsigned char *table;
+	struct file *entry;
 	drive_params_t p;
 	char buf[32];
 	int i;
@@ -29,27 +30,16 @@ void main(void)
 	get_drive_params(drive, &p);
 	printf("BIOS drive: %d\r\n", p.drive);
 	if((table = get_ftable(&p)) != NULL) {
-		for(i = 0; i < 2; i++) {
-			void *ftable = &table[i*16];
-			int j;
-
-			printf("FILE: ");
-			for(j = 0; j < 11; j++)
-				putc(((struct file*)ftable)->filename[j]);
-			printf("\r\nSector Count: %d\r\nStarting Sector: %d\r\n",
-				((struct file*)ftable)->num_sectors,
-				((struct file*)ftable)->start);
-		}
+		printf("Enter filename to execute: ");
+		gets(buf, sizeof(buf));
+		if((entry = search_file(table, buf)) != NULL)
+			exec_file(&p, entry);
+		else
+			printf("File: %s Not found.\r\n");
 	}
 	printf("Please enter your name: ");
 	gets(buf, sizeof(buf));
 	printf("Hello, %s!\r\n", buf);
-	printf("Please enter a file name: ");
-	gets(buf, sizeof(buf));
-	if(search_file(table, buf) != NULL)
-		printf("File: %s Found.\r\n", buf);
-	else
-		printf("File: %s Not found.\r\n");
 	type("Press any key to reboot...\r\n");
 
 	i = 0;
