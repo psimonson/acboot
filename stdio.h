@@ -12,6 +12,8 @@
 #include "attr.h"
 
 __REGPARM void setup(void);
+__REGPARM void getcur(unsigned char *x, unsigned char *y);
+__REGPARM void mvcur(unsigned char x, unsigned char y);
 __REGPARM void timer(unsigned short high, unsigned short low);
 __REGPARM void outb(unsigned short port, unsigned char val);
 __REGPARM unsigned char inb(unsigned short port);
@@ -28,7 +30,7 @@ void reverse(char *s);
 void itoa(int n, char *s, int size);
 void print(const char *data, int len);
 int printf(const char *fmt, ...);
-void gets(char *s, int size);
+int gets(char s[], int size);
 int memcpy(const void *s, const void *t, int size);
 
 #endif

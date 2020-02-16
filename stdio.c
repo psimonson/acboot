@@ -24,6 +24,28 @@ __REGPARM void setup(void)
 		"mov %ax, %gs\n"
 	);
 }
+/* Get cursor position on screen.
+ */
+__REGPARM void getcur(unsigned char *x, unsigned char *y)
+{
+	unsigned short pos = 0;
+	asm volatile(
+		"int $0x10"
+		: "=d"(pos)
+		: "a"(0x0300), "b"(0x0000)
+	);
+	*x = (unsigned char)(pos);
+	*y = (unsigned char)(pos >> 8);
+}
+/* Move cursor position on screen.
+ */
+__REGPARM void mvcur(unsigned char x, unsigned char y)
+{
+	asm volatile(
+		"int $0x10"
+		: : "a"(0x0200), "b"(0x0007), "d"((y << 8) | x)
+	);
+}
 /* Timer for waiting inside of code.
  */
 __REGPARM void timer(unsigned short high, unsigned short low)
@@ -216,15 +238,29 @@ int printf(const char *fmt, ...)
 }
 /* Get input from user into a buffer.
  */
-void gets(char *s, int size)
+int gets(char s[], int size)
 {
-	int c;
-	while(--size > 0 && (c = getc()) != '\r') {
-		*s++ = c;
-		putc(c);
+	unsigned char x, y;
+	int c, i;
+
+	for(i = 0; i < size && (c = getc()) != '\r'; ) {
+		if(c == '\b') {
+			if(i <= 0) i = 0;
+			else {
+				s[--i] = '\0';
+				getcur(&x, &y);
+				mvcur(x-1, y);
+				putc(' ');
+				mvcur(x-1, y);
+			}
+		} else {
+			s[i++] = c;
+			putc(c);
+		}
 	}
 	printf("\r\n");
-	*s = '\0';
+	s[i] = '\0';
+	return i;
 }
 /* Compare memory against each other to see if they're equal.
  */
