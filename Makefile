@@ -9,7 +9,7 @@ endif
 
 .PHONY: all disk kernel run clean disk-clean
 ifeq ($(KERNEL),yes)
-all: boot.bin io.sys binary.app
+all: boot.bin IO.SYS BINARY.APP
 else
 all: ft
 endif
@@ -20,13 +20,16 @@ endif
 io.elf: io.c.o stdio.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -o $@ $^
 
-io.sys: io.elf
-	objcopy -O binary io.elf io.sys
+binary.elf: binary.c.o stdio.c.o
+	$(LD) $(LDFLAGS) -o $@ $^
+
+IO.SYS: io.elf
+	objcopy -O binary $^ $@
+
+BINARY.APP: binary.elf
+	objcopy -O binary $^ $@
 
 boot.bin: boot.asm
-	nasm -f bin -o $@ $^
-
-binary.app: binary.asm
 	nasm -f bin -o $@ $^
 
 ft: ft.c.o prsfs.c.o
@@ -47,4 +50,4 @@ run: disk
 	qemu-system-i386 -fda floppy.img -boot a -soundhw pcspk
 
 clean: disk-clean
-	rm -f *.o ft binary.app io.elf io.sys boot.bin
+	rm -f *.o ft binary.elf io.elf BINARY.APP IO.SYS boot.bin

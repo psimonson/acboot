@@ -59,6 +59,7 @@ _start:
 	call load_kernel
 	cmp dx, 1
 	je .error
+	mov dl, byte [drive]
 	jmp 0x0100:0x0000
 
 .error:

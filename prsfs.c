@@ -73,9 +73,26 @@ int write_file(int fout, unsigned char sector_skip,
 	printf("Total sectors written: %d/%d\n", total_sectors, sector_count);
 	return 0;
 }
+/* Get filename from table entry.
+ */
+char *get_filename(struct file *entry)
+{
+	static char filename[13];
+	int i, j, k;
+
+	for(i = 0, k = 0; k < 8 && entry->filename[i] != ' '; i++, k++)
+		filename[i] = (char)entry->filename[k];
+	while(k < 8 && entry->filename[k] == ' ') k++;
+	if(entry->extension[0] != ' ')
+		filename[i++] = '.';
+	for(j = 0; entry->extension[i] != ' ' && j < 3; j++, i++)
+		filename[i] = (char)entry->extension[j];
+	filename[i] = '\0';
+	return filename;
+}
 /* Write file table to disk.
  */
-int write_table(int fout, struct file *table)
+int write_table(int fout, struct file *table, int fcnt)
 {
 	int total_bytes = 0;
 
@@ -87,5 +104,15 @@ int write_table(int fout, struct file *table)
 	}
 	printf("Table written totaling %d bytes.\n", total_bytes);
 	printf("Size of table struct is %lu.\n", sizeof(struct file));
+	if(fcnt > 0) {
+		int i;
+
+		for(i = 0; i < fcnt; i++) {
+			const char *filename = get_filename(&table[i]);
+			printf("File: %s\n", filename);
+			write_file(fout, table[i].start, table[i].num_sectors,
+				filename);
+		}
+	}
 	return 0;
 }

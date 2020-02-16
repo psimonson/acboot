@@ -14,9 +14,14 @@
 #include <fcntl.h>
 #include "prsfs.h"
 
-#define START_SECTOR  2		/* starting sector of operating system */
-#define TOTAL_SECTORS 10	/* total operating system sectors */
-
+/* number of files to write */
+#define FILE_COUNT	2
+/* some defines for io sys */
+#define IO_START	2		/* starting sector of operating system */
+#define IO_SECTORS	10		/* total operating system sectors */
+/* some defines for binary app */
+#define BINARY_START (IO_START+(IO_SECTORS+1))
+#define BINARY_SECTORS 6
 /* Program to create a simple file system.
  */
 int main(void)
@@ -25,17 +30,15 @@ int main(void)
 	int fout;
 
 	init_table(ftable);
-	init_entry(&ftable[0], "IO      SYS", TOTAL_SECTORS, START_SECTOR);
-	init_entry(&ftable[1], "BINARY  APP", 1, START_SECTOR+(TOTAL_SECTORS+1));
+	init_entry(&ftable[0], "IO      SYS", IO_SECTORS, IO_START);
+	init_entry(&ftable[1], "BINARY  APP", BINARY_SECTORS, BINARY_START);
 	errno = 0;
 	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));
 		return 1;
 	}
 	write_file(fout, 0, 1, "boot.bin");
-	write_table(fout, ftable);
-	write_file(fout, START_SECTOR, TOTAL_SECTORS, "io.sys");
-	write_file(fout, START_SECTOR+(TOTAL_SECTORS+1), 1, "binary.app");
+	write_table(fout, ftable, FILE_COUNT);
 	close(fout);
 	return 0;
 }
