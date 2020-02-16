@@ -117,7 +117,7 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 }
 /* Get my file system table from disk.
  */
-__REGPARM void *get_ftable(drive_params_t *p)
+__REGPARM void *get_ftable(const drive_params_t *p)
 {
 	static unsigned char sector[BLOCK_SIZE];
 	reset_disk(p);

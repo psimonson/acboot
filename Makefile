@@ -20,7 +20,7 @@ endif
 io.elf: io.c.o stdio.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
 
-binary.elf: binary.c.o stdio.c.o disk.c.o
+binary.elf: binary.c.o stdio.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -T binary.ld -o $@ $^
 
 IO.SYS: io.elf

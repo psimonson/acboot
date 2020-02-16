@@ -12,6 +12,8 @@ asm("jmpl $0, $main\n");
 #include "stdio.h"
 #include "disk.h"
 #include "types.h"
+#include "unused.h"
+#include "fs.h"
 
 /* Conversion macros */
 #define CONV_STR(x) #x
@@ -24,7 +26,7 @@ asm("jmpl $0, $main\n");
 struct cmd {
 	const char *cmd;
 	const char *help;
-	int (*func)(void);
+	int (*func)(const drive_params_t *p);
 };
 /* Command define */
 #define INIT_CMD_ARRAY		static struct cmd commands[] = {
@@ -34,15 +36,19 @@ struct cmd {
 
 /* -------------------------- Prototypes ----------------------------- */
 
-int cmd_help(void);
-int cmd_version(void);
-int cmd_exit(void);
+int cmd_help(const drive_params_t *p);
+int cmd_list(const drive_params_t *p);
+int cmd_find(const drive_params_t *p);
+int cmd_version(const drive_params_t *p);
+int cmd_exit(const drive_params_t *p);
 
 /* ------------------------------------------------------------------- */
 
 /* Make command array */
 INIT_CMD_ARRAY
 ADD_CMD_ARRAY("help", "Prints this information text.", cmd_help),
+ADD_CMD_ARRAY("list", "Prints all the files in the drive.", cmd_list),
+ADD_CMD_ARRAY("find", "Search the drive for a file.", cmd_find),
 ADD_CMD_ARRAY("version", "Prints the version information.", cmd_version),
 ADD_CMD_ARRAY("exit", "Exits back to the end of the OS.", cmd_exit)
 END_CMD_ARRAY
@@ -52,7 +58,7 @@ COUNT_COMMANDS
 
 /* Prints the help information to the screen.
  */
-int cmd_help(void)
+int cmd_help(const drive_params_t *UNUSED(p))
 {
 	int i;
 
@@ -61,16 +67,37 @@ int cmd_help(void)
 	}
 	return 0;
 }
+/* List all files in the root of the drive.
+ */
+int cmd_list(const drive_params_t *p)
+{
+	list_files(p);
+	return 0;
+}
+/* Search for a file in the root of the drive.
+ */
+int cmd_find(const drive_params_t *p)
+{
+	const unsigned char *table = get_ftable(p);
+	char buf[32];
+	printf("Enter file name: ");
+	gets(buf, sizeof(buf));
+	if(search_file(table, buf) != NULL)
+		printf("File %s found.\r\n", buf);
+	else
+		printf("File %s not found.\r\n", buf);
+	return 0;
+}
 /* Prints the version information to the screen.
  */
-int cmd_version(void)
+int cmd_version(const drive_params_t *UNUSED(p))
 {
 	printf("ASM/C Boot OS - Version %s\r\n", VERSION_INFO);
 	return 0;
 }
 /* Exits the shell program.
  */
-int cmd_exit(void)
+int cmd_exit(const drive_params_t *UNUSED(p))
 {
 	return 1;
 }
@@ -79,20 +106,20 @@ int cmd_exit(void)
 
 /* Execute a command in the shell.
  */
-int exec_cmd(const char *cmd)
+int exec_cmd(const char *cmd, const drive_params_t *p)
 {
 	int i;
 
 	for(i = 0; i < _total_commands; i++)
 		if(strcmp(commands[i].cmd, cmd) == 0)
-			return commands[i].func();
+			return commands[i].func(p);
 
 	printf("Bad command or filename.\r\n");
 	return 0;
 }
 /* Main loop for shell program.
  */
-void loop(void)
+void loop(const drive_params_t *p)
 {
 	char buf[64];
 	char done = 0;
@@ -102,7 +129,7 @@ void loop(void)
 	while(!done) {
 		printf("> ");
 		gets(buf, sizeof(buf));
-		done = exec_cmd(buf);
+		done = exec_cmd(buf, p);
 	}
 	printf("Shell quit.\r\n");
 }
@@ -115,7 +142,7 @@ void main(void)
 	asm volatile("" : "=d"(drive));
 	setup();
 	get_drive_params(drive, &p);
-	loop();
+	loop(&p);
 	asm volatile("" : : "d"(p.drive));
 	asm volatile("jmpl $0, $0x1000\n");
 }

@@ -15,5 +15,7 @@
 struct file *search_file(const unsigned char *ftable, const char *filename);
 /* Execute file in system */
 void exec_file(const drive_params_t *p, const struct file *entry);
+/* List files in root directory */
+void list_files(const drive_params_t *p);
 
 #endif
