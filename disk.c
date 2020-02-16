@@ -85,9 +85,35 @@ __REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 }
 /* Raw write to disk drive.
  */
-__REGPARM void write_disk(const unsigned char drive)
+__REGPARM int write_disk(const void *buffer, const drive_params_t *p,
+	unsigned int lba, unsigned char blocks)
 {
-	/* TODO: Implement raw write. */
+	unsigned short status = 0;
+	unsigned char failed = 0;
+	unsigned char c, h, s;
+
+	/* convert lba to chs */
+	s = (lba % p->spt) + 1;
+	c = (lba / p->spt) / p->numh;
+	h = (lba / p->spt) % p->numh;
+
+	asm volatile(
+		"push %%bx\n"
+		"push %%es\n"
+		"movb $0, %0\n"
+		"int $0x13\n"
+		"setcb %0\n"
+		"pop %%es\n"
+		"pop %%bx\n"
+		: "=r"(failed), "=a"(status)
+		: "a"(0x0300 | blocks), "b"(buffer), "c"((c << 8) | s),
+			"d"((h << 8) | p->drive)
+		: "cc"
+	);
+
+	if(failed)
+		return 0;
+	return (status & 0x00ff);
 }
 /* Get my file system table from disk.
  */
