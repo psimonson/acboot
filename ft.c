@@ -18,10 +18,10 @@
 #define FILE_COUNT	2
 /* some defines for io sys */
 #define IO_START	2		/* starting sector of operating system */
-#define IO_SECTORS	14		/* total operating system sectors */
+#define IO_SECTORS	13		/* total operating system sectors */
 /* some defines for binary app */
 #define BINARY_START (IO_START+IO_SECTORS)+1
-#define BINARY_SECTORS 17
+#define BINARY_SECTORS 16
 /* Program to create a simple file system.
  */
 int main(void)
