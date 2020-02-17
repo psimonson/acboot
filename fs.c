@@ -20,7 +20,8 @@ char *get_filename(const struct file *entry)
 	static char filename[13];
 	int i, j, k;
 
-	for(i = 0, k = 0; k < 8 && entry->filename[i] != ' '; i++, k++)
+	memset(filename, 0, 13);
+	for(i = 0, k = 0; k < 8 && entry->filename[k] != ' '; i++, k++)
 		filename[i] = (char)entry->filename[k];
 	while(k < 8 && entry->filename[k] == ' ') k++;
 	if(entry->extension[0] != ' ')
@@ -30,6 +31,26 @@ char *get_filename(const struct file *entry)
 	filename[i] = '\0';
 	return filename;
 }
+/* Get file name from user.
+ */
+char *get_filename_user(const char *filename)
+{
+	static char converted[12];
+	int i, j;
+
+	memset(converted, 0, 11);
+	for(i = 0, j = 0;
+		j < 8 && filename[j] != '.';
+		i++, j++)
+		converted[i] = filename[j];
+	while(i < 8 && filename[j] == '.')
+		converted[i++] = ' ';
+	++j;
+	for( ; j < 11 && filename[j] != ' '; j++, i++)
+		converted[i] = filename[j];
+	converted[i] = '\0';
+	return converted;
+}
 /* Search for file in file system and return if found.
  */
 struct file *search_file(const unsigned char *ftable, const char *filename)
@@ -38,8 +59,9 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 	int i;
 
 	for(i = 0; i < MAXFILES; i++) {
+		const char *fname = get_filename_user(filename);
 		entry = (struct file *)&ftable[i*16];
-		if(memcmp(entry->filename, filename, 11) == 0)
+		if(memcmp(fname, entry->filename, 11) == 0)
 			return entry;
 	}
 	return NULL;

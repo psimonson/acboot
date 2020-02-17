@@ -11,6 +11,10 @@
 
 #include "types.h"
 
+/* Get file name from system. */
+char *get_filename(const struct file *entry);
+/* Get file name from user. */
+char *get_filename_user(const char *filename);
 /* Find file in system */
 struct file *search_file(const unsigned char *ftable, const char *filename);
 /* Execute file in system */

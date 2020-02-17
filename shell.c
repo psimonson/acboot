@@ -121,7 +121,7 @@ int exec_cmd(const char *cmd, const drive_params_t *p)
  */
 void loop(const drive_params_t *p)
 {
-	char buf[64];
+	char buf[32];
 	char done = 0;
 
 	printf("Welcome to my command shell. Please type 'help'\r\n"
