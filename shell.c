@@ -143,6 +143,5 @@ void main(void)
 	setup();
 	get_drive_params(drive, &p);
 	loop(&p);
-	asm volatile("" : : "d"(p.drive));
-	asm volatile("jmpl $0, $0x1000\n");
+	asm volatile("jmpl $0x0000, $0x1000\n" : : "d"(p.drive));
 }
