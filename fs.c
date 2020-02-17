@@ -12,7 +12,10 @@ asm(".code16gcc\n");
 #include "disk.h"
 #include "fs.h"
 
+#ifndef IMAGE_ENTRY
 #define IMAGE_ENTRY 0x8000
+#endif
+
 /* Get file name from entry.
  */
 char *get_filename(const struct file *entry)
@@ -71,14 +74,19 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 void exec_file(const drive_params_t *p, const struct file *entry)
 {
 	void *buffer = (void*)IMAGE_ENTRY;
-	void *e = (void*)IMAGE_ENTRY;
+	unsigned short start_sector = entry->start;
+	unsigned short num_sectors = entry->num_sectors;
+	int num_read = 0;
+
 	reset_disk(p);
-	if(read_disk(buffer, p, entry->start, entry->num_sectors)
-			== entry->num_sectors) {
+	if((num_read = read_disk(buffer, p, start_sector, num_sectors))
+			== num_sectors) {
 		asm volatile("" : : "d"(p->drive));
-		goto *e;
+		goto *buffer;
 	}
-	printf("Binary could not be loaded.\r\n");
+
+	printf("Binary could not be loaded.\r\n"
+		"Total sectors read: %d/%d\r\n", num_read, num_sectors);
 }
 /* List root directory (all files).
  */

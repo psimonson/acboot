@@ -41,6 +41,7 @@ struct cmd {
 int cmd_help(const drive_params_t *p);
 int cmd_list(const drive_params_t *p);
 int cmd_find(const drive_params_t *p);
+int cmd_exec(const drive_params_t *p);
 int cmd_version(const drive_params_t *p);
 int cmd_exit(const drive_params_t *p);
 
@@ -51,6 +52,7 @@ INIT_CMD_ARRAY
 ADD_CMD_ARRAY("help", "Prints this information text.", cmd_help),
 ADD_CMD_ARRAY("list", "Prints all the files in the drive.", cmd_list),
 ADD_CMD_ARRAY("find", "Search the drive for a file.", cmd_find),
+ADD_CMD_ARRAY("exec", "Execute a program from disk.", cmd_exec),
 ADD_CMD_ARRAY("version", "Prints the version information.", cmd_version),
 ADD_CMD_ARRAY("exit", "Exits back to the end of the OS.", cmd_exit)
 END_CMD_ARRAY
@@ -88,6 +90,24 @@ int cmd_find(const drive_params_t *p)
 		printf("File %s found.\r\n", buf);
 	else
 		printf("File %s not found.\r\n", buf);
+	return 0;
+}
+/* Execute a program from disk.
+ */
+int cmd_exec(const drive_params_t *p)
+{
+	const unsigned char *table = get_ftable(p);
+	struct file *entry;
+	char buf[32];
+	if(table != NULL) {
+		printf("Enter program name: ");
+		gets(buf, sizeof(buf));
+		if((entry = search_file(table, buf)) != NULL) {
+				exec_file(p, entry);
+		} else {
+			printf("App not found.\r\n");
+		}
+	}
 	return 0;
 }
 /* Prints the version information to the screen.

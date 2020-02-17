@@ -46,6 +46,24 @@ __REGPARM void mvcur(unsigned char x, unsigned char y)
 		: : "a"(0x0200), "b"(0x0007), "d"((y << 8) | x)
 	);
 }
+/* Clear the screen.
+ */
+__REGPARM void clrscr(unsigned char mode)
+{
+	asm volatile(
+		"int $0x10"
+		: : "a"(0x0000 | mode)
+	);
+}
+/* Draw a pixel on the screen.
+ */
+__REGPARM void draw_pixel(unsigned char color, unsigned short x,
+	unsigned short y) {
+	asm volatile(
+		"int $0x10"
+		: : "a"(0x0c00 | color), "c"(x), "d"(y)
+	);
+}
 /* Timer for waiting inside of code.
  */
 __REGPARM void timer(unsigned short high, unsigned short low)

@@ -14,6 +14,9 @@
 __REGPARM void setup(void);
 __REGPARM void getcur(unsigned char *x, unsigned char *y);
 __REGPARM void mvcur(unsigned char x, unsigned char y);
+__REGPARM void clrscr(unsigned char mode);
+__REGPARM void draw_pixel(unsigned char color, unsigned short x,
+	unsigned short y);
 __REGPARM void timer(unsigned short high, unsigned short low);
 __REGPARM void outb(unsigned short port, unsigned char val);
 __REGPARM unsigned char inb(unsigned short port);
