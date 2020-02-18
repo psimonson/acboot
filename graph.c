@@ -6,10 +6,11 @@
  ***********************************************************************
  */
 
-asm(".code16gcc\n");
-asm("jmpl $0, $main\n");
+asm(".code16gcc");
+asm("jmpl $0, $main");
 
 #include "stdio.h"
+#include "types.h"
 #include "disk.h"
 
 #define MAX_COLS	320
@@ -19,6 +20,7 @@ asm("jmpl $0, $main\n");
  */
 void main(void)
 {
+	const void *e = (const void *)0x1000;
 	unsigned char drive = -1;
 	drive_params_t p;
 	unsigned short i = 0, j = 0, m = 0;
@@ -27,8 +29,9 @@ void main(void)
 
 	asm volatile("" : "=d"(drive));
 	setup();
-	clrscr(0x03);
 	get_drive_params(drive, &p);
+
+	clrscr(0x03);
 	printf("This is a graphics demonstration it waits until a\r\n"
 		"key is pressed otherwise continues to draw rectangles.\r\n"
 		"Press any key to continue to the demonstration...\r\n");
@@ -66,5 +69,5 @@ void main(void)
 	}
 	clrscr(0x03);
 	asm("" : : "d"(p.drive));
-	goto *(void*)0x1000;
+	goto *e;
 }

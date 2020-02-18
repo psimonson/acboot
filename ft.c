@@ -42,7 +42,7 @@ int main(void)
 		return 1;
 	}
 	write_file(fout, 0, 1, "boot.bin");
-	write_table(fout, ftable, FILE_COUNT);
+	write_table(fout, ftable);
 	close(fout);
 	return 0;
 }

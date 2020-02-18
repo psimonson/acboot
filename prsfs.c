@@ -14,6 +14,8 @@
 #include <fcntl.h>
 #include "prsfs.h"
 
+/* Number of files in file system */
+static int _prsfs_file_count;
 /* Initialise ftable memory.
  */
 void init_table(struct file *table)
@@ -23,6 +25,7 @@ void init_table(struct file *table)
 	memset(table, 0, sizeof(struct file)*MAXFILES);
 	for(i = 0; i < MAXFILES; i++)
 		memcpy(table[i].filename, &c, 1);
+	_prsfs_file_count = 0;
 }
 /* Initialise ftable entry.
  */
@@ -33,6 +36,8 @@ void init_entry(struct file *entry, const char *filename,
 	memcpy(entry->filename, filename, 11);
 	entry->num_sectors = num_sectors;
 	entry->start = start;
+	entry->_reserved = 0;
+	_prsfs_file_count++;
 }
 /* Print binary table from entry.
  */
@@ -92,7 +97,7 @@ char *get_filename(struct file *entry)
 }
 /* Write file table to disk.
  */
-int write_table(int fout, struct file *table, int fcnt)
+int write_table(int fout, struct file *table)
 {
 	int total_bytes = 0;
 
@@ -104,10 +109,10 @@ int write_table(int fout, struct file *table, int fcnt)
 	}
 	printf("Table written totaling %d bytes.\n", total_bytes);
 	printf("Size of table struct is %lu.\n", sizeof(struct file));
-	if(fcnt > 0) {
+	if(_prsfs_file_count > 0) {
 		int i;
 
-		for(i = 0; i < fcnt; i++) {
+		for(i = 0; i < _prsfs_file_count; i++) {
 			const char *filename = get_filename(&table[i]);
 			printf("File: %s\n", filename);
 			write_file(fout, table[i].start, table[i].num_sectors,
