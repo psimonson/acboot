@@ -12,8 +12,6 @@ asm(".code16gcc\n");
 #include "disk.h"
 #include "fs.h"
 
-#define IMAGE_ENTRY 0x7e00
-
 /* Get file name from entry.
  */
 char *get_filename(const struct file *entry)

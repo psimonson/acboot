@@ -13,6 +13,7 @@ asm("jmpl $0, $main\n");
 #include "disk.h"
 #include "types.h"
 #include "unused.h"
+#define SHELL_ENTRY
 #include "fs.h"
 
 /* Boot sector entry */
