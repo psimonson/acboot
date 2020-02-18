@@ -12,9 +12,7 @@ asm(".code16gcc\n");
 #include "disk.h"
 #include "fs.h"
 
-#ifndef IMAGE_ENTRY
 #define IMAGE_ENTRY 0x8000
-#endif
 
 /* Get file name from entry.
  */

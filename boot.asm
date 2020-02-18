@@ -60,7 +60,7 @@ _start:
 	cmp dx, 1
 	je .error
 	mov dl, byte [drive]
-	jmp 0x0100:0x0000
+	jmp 0x0000:0x0500
 
 .error:
 	call reboot
@@ -99,7 +99,7 @@ load_kernel:
 .match:
 	mov ax, word [bx+13]
 	mov cx, word [bx+11]
-	mov bx, 0x0100
+	mov bx, 0x0500
 	mov es, bx
 	xor bx, bx
 	call read_sectors

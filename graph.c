@@ -28,7 +28,7 @@ void main(void)
 	unsigned color = 10;
 
 	asm volatile("" : "=d"(drive));
-	setup();
+	setup(0x0000);
 	get_drive_params(drive, &p);
 
 	clrscr(0x03);

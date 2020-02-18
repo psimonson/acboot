@@ -167,7 +167,7 @@ void main(void)
 	unsigned char drive = -1;
 	drive_params_t p;
 	asm volatile("" : "=d"(drive));
-	setup();
+	setup(0x0000);
 	get_drive_params(drive, &p);
 	loop(&p);
 	asm volatile("" : : "d"(p.drive));
