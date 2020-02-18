@@ -101,11 +101,15 @@ int cmd_exec(const drive_params_t *p)
 	char buf[32];
 	printf("Enter program name: ");
 	gets(buf, sizeof(buf));
-	if((table = get_ftable(p)) != NULL) {
-		if((entry = search_file(table, buf)) != NULL) {
-				exec_file(p, entry);
-		} else {
-			printf("App not found.\r\n");
+	if(memcmp(buf, "IO.SYS", 6) == 0 || memcmp(buf, "SHELL.APP", 6) == 0)
+		printf("Cannot execute, %s is a system file.\r\n", buf);
+	else {
+		if((table = get_ftable(p)) != NULL) {
+			if((entry = search_file(table, buf)) != NULL) {
+					exec_file(p, entry);
+			} else {
+				printf("App not found.\r\n");
+			}
 		}
 	}
 	return 0;

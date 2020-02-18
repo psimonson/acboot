@@ -21,7 +21,7 @@
 #define IO_SECTORS	14		/* total operating system sectors */
 /* some defines for binary app */
 #define SHELL_START (IO_START+IO_SECTORS)+1
-#define SHELL_SECTORS 16
+#define SHELL_SECTORS 17
 /* some defines for graph app */
 #define GRAPH_START (SHELL_START+SHELL_SECTORS)+1
 #define GRAPH_SECTORS 11
