@@ -30,6 +30,7 @@ void main(void)
 	unsigned color = 10;
 
 	asm volatile("" : "=d"(drive));
+
 	setup(0x0000);
 	get_drive_params(drive, &p);
 

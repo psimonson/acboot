@@ -16,7 +16,7 @@ asm("jmpl $0, $main\n");
 #include "fs.h"
 
 /* Boot sector entry */
-#define BOOT_ENTRY 0x1000
+#define BOOT_ENTRY 0x0500
 /* Conversion macros */
 #define CONV_STR(x) #x
 #define STR(x) CONV_STR(x)
@@ -166,10 +166,14 @@ void main(void)
 	const void *e = (const void *)BOOT_ENTRY;
 	unsigned char drive = -1;
 	drive_params_t p;
+
 	asm volatile("" : "=d"(drive));
+
 	setup(0x0000);
 	get_drive_params(drive, &p);
+
 	loop(&p);
+
 	asm volatile("" : : "d"(p.drive));
 	goto *e;
 }

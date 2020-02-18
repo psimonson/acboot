@@ -15,7 +15,7 @@ endif
 
 .PHONY: all disk kernel run clean disk-clean
 ifeq ($(KERNEL),yes)
-all: boot.bin IO.SYS SHELL.APP GRAPH.APP
+all: boot.bin IO.SYS SHELL.APP GRAPH.APP HELLO.APP
 else
 all: ft
 endif
@@ -32,6 +32,9 @@ shell.elf: shell.c.o stdio.c.o disk.c.o fs.c.o
 graph.elf: graph.c.o stdio.c.o disk.c.o
 	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
 
+hello.elf: hello.c.o stdio.c.o disk.c.o
+	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
+
 IO.SYS: io.elf
 	objcopy $(DEBUG_INFO) -O binary $^ $@
 
@@ -39,6 +42,9 @@ SHELL.APP: shell.elf
 	objcopy $(DEBUG_INFO) -O binary $^ $@
 
 GRAPH.APP: graph.elf
+	objcopy $(DEBUG_INFO) -O binary $^ $@
+
+HELLO.APP: hello.elf
 	objcopy $(DEBUG_INFO) -O binary $^ $@
 
 boot.bin: boot.asm
