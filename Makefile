@@ -27,7 +27,7 @@ io.elf: io.c.o stdio.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -T io.ld -o $@ $^
 
 shell.elf: shell.c.o stdio.c.o disk.c.o fs.c.o
-	$(LD) $(LDFLAGS) -T shell.ld -o $@ $^
+	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
 
 graph.elf: graph.c.o stdio.c.o disk.c.o
 	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
