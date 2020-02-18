@@ -96,12 +96,12 @@ int cmd_find(const drive_params_t *p)
  */
 int cmd_exec(const drive_params_t *p)
 {
-	const unsigned char *table = get_ftable(p);
+	unsigned char *table;
 	struct file *entry;
 	char buf[32];
-	if(table != NULL) {
-		printf("Enter program name: ");
-		gets(buf, sizeof(buf));
+	printf("Enter program name: ");
+	gets(buf, sizeof(buf));
+	if((table = get_ftable(p)) != NULL) {
 		if((entry = search_file(table, buf)) != NULL) {
 				exec_file(p, entry);
 		} else {

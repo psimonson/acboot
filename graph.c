@@ -15,21 +15,19 @@ asm("jmpl $0, $main\n");
 #define MAX_COLS	320
 #define MAX_ROWS	200
 
-#define IMAGE_ENTRY 0x1000 /* entry point for boot sector */
-
 /* Program to display rectangles on screen.
  */
 void main(void)
 {
-	const void *e = (const void *)IMAGE_ENTRY;
-	int i = 0, j = 0, m = 0;
-	int cnt1 = 0, cnt2 = 0;
-	unsigned color = 10;
 	unsigned char drive = -1;
 	drive_params_t p;
+	unsigned short i = 0, j = 0, m = 0;
+	unsigned short cnt1 = 0, cnt2 = 0;
+	unsigned color = 10;
 
 	asm volatile("" : "=d"(drive));
 	setup();
+	clrscr(0x03);
 	get_drive_params(drive, &p);
 	printf("This is a graphics demonstration it waits until a\r\n"
 		"key is pressed otherwise continues to draw rectangles.\r\n"
@@ -68,5 +66,5 @@ void main(void)
 	}
 	clrscr(0x03);
 	asm("" : : "d"(p.drive));
-	goto *e;
+	goto *(void*)0x1000;
 }

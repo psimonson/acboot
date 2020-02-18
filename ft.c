@@ -18,7 +18,7 @@
 #define FILE_COUNT	3
 /* some defines for io sys */
 #define IO_START	2		/* starting sector of operating system */
-#define IO_SECTORS	13		/* total operating system sectors */
+#define IO_SECTORS	14		/* total operating system sectors */
 /* some defines for binary app */
 #define SHELL_START (IO_START+IO_SECTORS)+1
 #define SHELL_SECTORS 16

@@ -35,6 +35,6 @@ void main(void)
 	}
 	type("Press any key to reboot...\r\n");
 	asm volatile(
-		"jmpl $0xffff, $0x0000"
+		"jmpl $0x0000, $0xffff"
 	);
 }

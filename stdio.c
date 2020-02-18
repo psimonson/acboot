@@ -22,6 +22,7 @@ __REGPARM void setup(void)
 		"mov %ax, %es\n"
 		"mov %ax, %fs\n"
 		"mov %ax, %gs\n"
+		"mov %ax, %ss\n"
 	);
 }
 /* Get cursor position on screen.
