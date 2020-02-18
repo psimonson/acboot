@@ -11,12 +11,6 @@
 
 #include "types.h"
 
-#ifdef SHELL_ENTRY
-#define IMAGE_ENTRY 0x7e00
-#else
-#define IMAGE_ENTRY 0x8000
-#endif
-
 /* Get file name from system. */
 char *get_filename(const struct file *entry);
 /* Get file name from user. */

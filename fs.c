@@ -12,6 +12,8 @@ asm(".code16gcc\n");
 #include "disk.h"
 #include "fs.h"
 
+#define IMAGE_ENTRY 0x8000
+
 /* Get file name from entry.
  */
 char *get_filename(const struct file *entry)
@@ -69,7 +71,7 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
  */
 void exec_file(const drive_params_t *p, const struct file *entry)
 {
-	void *buffer = (void*)IMAGE_ENTRY;
+	void *buffer = (void *)IMAGE_ENTRY;
 	unsigned short start_sector = entry->start;
 	unsigned short num_sectors = entry->num_sectors;
 	int num_read = 0;

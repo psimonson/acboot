@@ -6,16 +6,17 @@
  *********************************************************************
  */
 
-asm(".code16gcc\n");
-asm("jmpl $0, $main\n");
+asm(".code16gcc");
+asm("jmpl $0, $main");
 
 #include "stdio.h"
 #include "disk.h"
 #include "types.h"
 #include "unused.h"
-#define SHELL_ENTRY
 #include "fs.h"
 
+/* Program entry point */
+#define PROGRAM_ENTRY 0x9000
 /* Boot sector entry */
 #define BOOT_ENTRY 0x0500
 /* Conversion macros */
@@ -93,6 +94,24 @@ int cmd_find(const drive_params_t *p)
 		printf("File %s not found.\r\n", buf);
 	return 0;
 }
+/* This function is for executing a program from disk.
+ */
+void execute_program(const drive_params_t *p, const struct file *entry)
+{
+	void *buffer = (void *)PROGRAM_ENTRY;
+	unsigned short num_read = 0;
+
+	reset_disk(p);
+	if((num_read = read_disk(buffer, p, entry->start, entry->num_sectors))
+		== entry->num_sectors) {
+		asm volatile("" : : "d"(p->drive));
+		goto *buffer;
+	}
+
+	printf("Binary could not be executed.\r\n"
+		"How many sectors read: %d/%d\r\n",
+		num_read, entry->num_sectors);
+}
 /* Execute a program from disk.
  */
 int cmd_exec(const drive_params_t *p)
@@ -100,14 +119,15 @@ int cmd_exec(const drive_params_t *p)
 	unsigned char *table;
 	struct file *entry;
 	char buf[32];
+
 	printf("Enter program name: ");
 	gets(buf, sizeof(buf));
-	if(memcmp(buf, "IO.SYS", 6) == 0 || memcmp(buf, "SHELL.APP", 6) == 0)
+	if(memcmp(buf, "IO.SYS", 6) == 0 || memcmp(buf, "SHELL.APP", 9) == 0)
 		printf("Cannot execute, %s is a system file.\r\n", buf);
 	else {
 		if((table = get_ftable(p)) != NULL) {
 			if((entry = search_file(table, buf)) != NULL) {
-					exec_file(p, entry);
+					execute_program(p, entry);
 			} else {
 				printf("App not found.\r\n");
 			}
