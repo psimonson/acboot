@@ -60,6 +60,11 @@ _start:
 	cmp dx, 1
 	je .error
 	mov dl, byte [drive]
+	mov ax, 0x0500
+	mov ds, ax
+	mov es, ax
+	mov gs, ax
+	mov fs, ax
 	jmp 0x0000:0x0500
 
 .error:
@@ -99,8 +104,6 @@ load_kernel:
 .match:
 	mov ax, word [bx+13]
 	mov cx, word [bx+11]
-	xor bx, bx
-	mov es, bx
 	mov bx, 0x0500
 	call read_sectors
 	mov si, done

@@ -25,7 +25,7 @@ void main(void)
 
 	asm volatile("" : "=d"(drive));
 
-	setup(0x0000);
+	setup();
 	get_drive_params(drive, &p);
 
 	printf("BIOS drive: %d\r\n", p.drive);

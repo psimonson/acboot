@@ -15,10 +15,8 @@ asm("jmpl $0, $main");
 #include "unused.h"
 #include "fs.h"
 
-/* Program entry point */
-#define PROGRAM_ENTRY 0x9000
 /* Boot sector entry */
-#define BOOT_ENTRY 0x0500
+#define SHELL_ENTRY 0x0500
 /* Conversion macros */
 #define CONV_STR(x) #x
 #define STR(x) CONV_STR(x)
@@ -94,24 +92,6 @@ int cmd_find(const drive_params_t *p)
 		printf("File %s not found.\r\n", buf);
 	return 0;
 }
-/* This function is for executing a program from disk.
- */
-void execute_program(const drive_params_t *p, const struct file *entry)
-{
-	void *buffer = (void *)PROGRAM_ENTRY;
-	unsigned short num_read = 0;
-
-	reset_disk(p);
-	if((num_read = read_disk(buffer, p, entry->start, entry->num_sectors))
-		== entry->num_sectors) {
-		asm volatile("" : : "d"(p->drive));
-		goto *buffer;
-	}
-
-	printf("Binary could not be executed.\r\n"
-		"How many sectors read: %d/%d\r\n",
-		num_read, entry->num_sectors);
-}
 /* Execute a program from disk.
  */
 int cmd_exec(const drive_params_t *p)
@@ -127,7 +107,7 @@ int cmd_exec(const drive_params_t *p)
 	else {
 		if((table = get_ftable(p)) != NULL) {
 			if((entry = search_file(table, buf)) != NULL) {
-					execute_program(p, entry);
+					exec_file(p, entry);
 			} else {
 				printf("App not found.\r\n");
 			}
@@ -184,15 +164,14 @@ void loop(const drive_params_t *p)
  */
 void main(void)
 {
-	const void *e = (const void *)BOOT_ENTRY;
+	const void *e = (const void *)SHELL_ENTRY;
 	unsigned char drive = -1;
 	drive_params_t p;
 
 	asm volatile("" : "=d"(drive));
 
-	setup(0x0000);
+	setup();
 	get_drive_params(drive, &p);
-
 	loop(&p);
 
 	asm volatile("" : : "d"(p.drive));

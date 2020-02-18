@@ -13,19 +13,19 @@ asm("jmpl $0, $main");
 #include "disk.h"
 
 /* Boot sector entry */
-#define BOOT_ENTRY 0x0500
+#define SHELL_ENTRY 0x0500
 
 /* Simple shell program for my OS.
  */
 void main(void)
 {
-	const void *e = (const void *)BOOT_ENTRY;
+	const void *e = (const void *)SHELL_ENTRY;
 	unsigned char drive = -1;
 	drive_params_t p;
 
 	asm volatile("" : "=d"(drive));
 
-	setup(0x0000);
+	setup();
 	get_drive_params(drive, &p);
 
 	printf("Hello world!\r\n");
