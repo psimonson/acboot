@@ -13,7 +13,7 @@ asm("jmpl $0, $main");
 #include "disk.h"
 
 /* Boot sector entry */
-#define SHELL_ENTRY 0x0500
+#define SHELL_ENTRY 0x7e00
 
 /* Simple shell program for my OS.
  */

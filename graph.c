@@ -16,7 +16,7 @@ asm("jmpl $0, $main");
 #define MAX_COLS	320
 #define MAX_ROWS	200
 
-#define SHELL_ENTRY 0x0500
+#define SHELL_ENTRY 0x7e00
 
 /* Program to display rectangles on screen.
  */

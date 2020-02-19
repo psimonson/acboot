@@ -15,8 +15,10 @@ asm("jmpl $0, $main");
 #include "unused.h"
 #include "fs.h"
 
-/* Boot sector entry */
-#define SHELL_ENTRY 0x0500
+/* Program entry */
+#define PROGRAM_ENTRY 0x9000
+/* Shell entry */
+#define SHELL_ENTRY 0x7e00
 /* Conversion macros */
 #define CONV_STR(x) #x
 #define STR(x) CONV_STR(x)
@@ -107,7 +109,7 @@ int cmd_exec(const drive_params_t *p)
 	else {
 		if((table = get_ftable(p)) != NULL) {
 			if((entry = search_file(table, buf)) != NULL) {
-					exec_file(p, entry);
+					exec_file(p, entry, (void*)PROGRAM_ENTRY);
 			} else {
 				printf("App not found.\r\n");
 			}
