@@ -3,7 +3,7 @@ CFLAGS=-std=gnu89 -Wall -Wextra -Wno-unused-parameter
 LDFLAGS=
 KERNEL=no
 ifeq ($(KERNEL),yes)
-CFLAGS+=-m32 -fno-builtin -nostdlib -ffreestanding -fno-stack-protector
+CFLAGS+=-m16 -fno-builtin -nostdlib -ffreestanding -fno-stack-protector
 LDFLAGS=-m elf_i386
 DEBUG?=no
 ifeq ($(DEBUG),yes)
