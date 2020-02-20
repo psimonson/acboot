@@ -7,7 +7,7 @@
  */
 
 asm(".code16gcc");
-asm("jmpl $0, $main");
+asm("jmp main");
 
 #include "stdio.h"
 #include "types.h"
@@ -24,7 +24,7 @@ void main(void)
 	drive_params_t p;
 
 	asm volatile("" : "=d"(drive));
-	setup(0x0000);
+	setup(0x0050);
 	get_drive_params(drive, &p);
 
 	printf("BIOS drive: %d\r\n", p.drive);

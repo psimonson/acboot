@@ -17,8 +17,9 @@ endif
 ifeq ($(KERNEL),yes)
 all: boot.bin IO.SYS SHELL.APP GRAPH.APP HELLO.APP
 else
-all: ft
-	$(MAKE) KERNEL=yes
+all:
+	$(MAKE) KERNEL=yes $(DEBUG)
+	$(MAKE) ft
 endif
 
 %.c.o: %.c
@@ -54,22 +55,14 @@ boot.bin: boot.asm
 ft: ft.c.o prsfs.c.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
-kernel:
-	$(MAKE) KERNEL=yes
-	$(MAKE)
-
-kernel-debug:
-	$(MAKE) KERNEL=yes DEBUG=yes
-	$(MAKE)
-
 disk-clean:
 	rm -f floppy.img
 
-disk-debug: disk-clean kernel-debug
+disk-debug: disk-clean all-debug
 	dd if=/dev/zero of=floppy.img bs=512 count=2880
 	./ft
 
-disk: disk-clean kernel
+disk: disk-clean all
 	dd if=/dev/zero of=floppy.img bs=512 count=2880
 	./ft
 

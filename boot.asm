@@ -4,10 +4,10 @@
 ; by Philip R. Simonson
 ; ===============================================================
 [bits 16]
-[org 0x0000]
+[org 0x0]
 
-jmp short _start
 nop
+jmp short _start
 
 SectorsPerTrack db 18
 NumHeads db 2
@@ -64,9 +64,7 @@ _start:
 	cmp dx, 1
 	je .error
 	mov dl, byte [drive]
-	push 0x0200
-	push 0x0000
-	retf
+	jmp 0x0050:0x0000
 
 .error:
 	call reboot
@@ -105,7 +103,7 @@ load_kernel:
 .match:
 	mov ax, word [bx+13]
 	mov cx, word [bx+11]
-	mov bx, 0x0200
+	mov bx, 0x0050
 	mov es, bx
 	xor bx, bx
 	call read_sectors
@@ -198,7 +196,6 @@ crlf db 0ah,0dh,24h
 drive db 0
 kernel db "IO      SYS"
 root dw 0x0200
-io_addr dw 0x0000
 absTrack dw 0
 absSector dw 0
 absHead dw 0

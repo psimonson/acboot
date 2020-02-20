@@ -7,7 +7,7 @@
  */
 
 asm(".code16gcc");
-asm("jmpl $0, $main");
+asm("jmp main");
 
 #include "stdio.h"
 #include "disk.h"

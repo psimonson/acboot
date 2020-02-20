@@ -17,10 +17,14 @@ asm(".code16gcc");
 __REGPARM void setup(unsigned short offset)
 {
 	asm volatile(
+		"cli\n"
 		"mov %%ax, %%ds\n"
 		"mov %%ax, %%es\n"
 		"mov %%ax, %%fs\n"
 		"mov %%ax, %%gs\n"
+		"mov %%ax, %%ss\n"
+		"mov $0xffff, %%sp\n"
+		"sti\n"
 		:
 		: "a"(offset)
 	);
