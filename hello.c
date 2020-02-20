@@ -25,7 +25,7 @@ void main(void)
 
 	asm volatile("" : "=d"(drive));
 
-	setup();
+	setup(0x0000);
 	get_drive_params(drive, &p);
 
 	printf("Hello world!\r\n");

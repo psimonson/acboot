@@ -18,6 +18,7 @@ ifeq ($(KERNEL),yes)
 all: boot.bin IO.SYS SHELL.APP GRAPH.APP HELLO.APP
 else
 all: ft
+	$(MAKE) KERNEL=yes
 endif
 
 %.c.o: %.c

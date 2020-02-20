@@ -31,7 +31,7 @@ void main(void)
 
 	asm volatile("" : "=d"(drive));
 
-	setup();
+	setup(0x0000);
 	get_drive_params(drive, &p);
 	clrscr(0x03);
 	printf("This is a graphics demonstration it waits until a\r\n"

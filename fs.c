@@ -67,15 +67,14 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 }
 /* Execute file entry and jump to it.
  */
-void exec_file(const drive_params_t *p, const struct file *entry,
-	void *e)
+void exec_file(const drive_params_t *p, const struct file *entry)
 {
+	void *e = (void*)SHELL_ENTRY;
 	unsigned short start_sector = entry->start;
 	unsigned short num_sectors = entry->num_sectors;
 	int num_read = 0;
 
 	reset_disk(p);
-	asm volatile("" : : "b"(*(unsigned short *)e));
 	if((num_read = read_disk(e, p, start_sector, num_sectors))
 			== num_sectors) {
 		asm volatile("" : : "d"(p->drive));

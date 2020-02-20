@@ -1,7 +1,7 @@
 ENTRY(main);
 SECTIONS
 {
-	. = 0x0500;
+	. = 0x2000;
 	.text :
 	{
 		*(.text);

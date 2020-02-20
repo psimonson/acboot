@@ -4,7 +4,7 @@
 ; by Philip R. Simonson
 ; ===============================================================
 [bits 16]
-[org 0x7c00]
+[org 0x0000]
 
 jmp short _start
 nop
@@ -14,10 +14,14 @@ NumHeads db 2
 
 _start:
 	mov byte [drive], dl
-	xor ax, ax
+	cli
+	mov ax, 0x07c0
 	mov ds, ax
 	mov es, ax
-	cli
+	mov fs, ax
+	mov gs, ax
+
+	xor ax, ax
 	mov ss, ax
 	mov sp, 0xffff
 	sti
@@ -60,12 +64,9 @@ _start:
 	cmp dx, 1
 	je .error
 	mov dl, byte [drive]
-	mov ax, 0x0500
-	mov ds, ax
-	mov es, ax
-	mov gs, ax
-	mov fs, ax
-	jmp 0x0000:0x0500
+	push 0x0200
+	push 0x0000
+	retf
 
 .error:
 	call reboot
@@ -104,7 +105,9 @@ load_kernel:
 .match:
 	mov ax, word [bx+13]
 	mov cx, word [bx+11]
-	mov bx, 0x0500
+	mov bx, 0x0200
+	mov es, bx
+	xor bx, bx
 	call read_sectors
 	mov si, done
 	call print
@@ -195,6 +198,7 @@ crlf db 0ah,0dh,24h
 drive db 0
 kernel db "IO      SYS"
 root dw 0x0200
+io_addr dw 0x0000
 absTrack dw 0
 absSector dw 0
 absHead dw 0

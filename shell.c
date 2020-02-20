@@ -15,10 +15,6 @@ asm("jmpl $0, $main");
 #include "unused.h"
 #include "fs.h"
 
-/* Program entry */
-#define PROGRAM_ENTRY 0x9000
-/* Shell entry */
-#define SHELL_ENTRY 0x7e00
 /* Conversion macros */
 #define CONV_STR(x) #x
 #define STR(x) CONV_STR(x)
@@ -109,7 +105,7 @@ int cmd_exec(const drive_params_t *p)
 	else {
 		if((table = get_ftable(p)) != NULL) {
 			if((entry = search_file(table, buf)) != NULL) {
-					exec_file(p, entry, (void*)PROGRAM_ENTRY);
+					exec_file(p, entry);
 			} else {
 				printf("App not found.\r\n");
 			}
@@ -166,16 +162,15 @@ void loop(const drive_params_t *p)
  */
 void main(void)
 {
-	const void *e = (const void *)SHELL_ENTRY;
 	unsigned char drive = -1;
 	drive_params_t p;
 
 	asm volatile("" : "=d"(drive));
 
-	setup();
+	setup(0x0000);
 	get_drive_params(drive, &p);
 	loop(&p);
 
-	asm volatile("" : : "d"(p.drive));
-	goto *e;
+	printf("Halting system...\r\n");
+	asm volatile("hlt");
 }

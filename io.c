@@ -14,8 +14,6 @@ asm("jmpl $0, $main");
 #include "disk.h"
 #include "fs.h"
 
-#define SHELL_ENTRY 0x7e00
-
 /* Entry point for boot program.
  */
 void main(void)
@@ -26,14 +24,13 @@ void main(void)
 	drive_params_t p;
 
 	asm volatile("" : "=d"(drive));
-
-	setup();
+	setup(0x0000);
 	get_drive_params(drive, &p);
 
 	printf("BIOS drive: %d\r\n", p.drive);
 	if((table = get_ftable(&p)) != NULL) {
 		if((entry = search_file(table, "SHELL.APP")) != NULL)
-			exec_file(&p, entry, (void*)SHELL_ENTRY);
+			exec_file(&p, entry);
 		else
 			printf("File: %s Not found.\r\n");
 	}
