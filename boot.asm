@@ -17,12 +17,9 @@ _start:
 	mov ax, 0x07c0
 	mov ds, ax
 	mov es, ax
-	mov fs, ax
-	mov gs, ax
-
-	xor ax, ax
+	mov ax, 0x8000
 	mov ss, ax
-	mov sp, 0x7c00
+	mov sp, 0x9000
 	sti
 
 	; store bios drive
@@ -66,7 +63,7 @@ _start:
 	cmp dx, 1
 	je .error
 	mov dl, byte [drive]
-	jmp 0x0100:0x0000
+	jmp 0x0050:0x0000
 
 .error:
 	call reboot
@@ -105,7 +102,7 @@ load_kernel:
 .match:
 	mov ax, word [bx+13]
 	mov cx, word [bx+11]
-	mov bx, 0x0100
+	mov bx, 0x0050
 	mov es, bx
 	xor bx, bx
 	call read_sectors
