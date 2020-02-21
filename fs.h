@@ -12,7 +12,7 @@
 #include "types.h"
 
 /* Memory address for shell entry point */
-#define SHELL_ENTRY 0x8000
+#define SHELL_ENTRY 0x9000
 
 /* Get file name from system. */
 char *get_filename(const struct file *entry);
