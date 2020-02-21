@@ -7,13 +7,12 @@
  */
 
 asm(".code16gcc");
-asm("jmpl $0, $main");
+asm("jmp main");
 
 #include "stdio.h"
 #include "disk.h"
 
-/* Boot sector entry */
-#define SHELL_ENTRY 0x7e00
+#define SHELL_ENTRY 0x0800
 
 /* Simple shell program for my OS.
  */
@@ -23,9 +22,8 @@ void main(void)
 	unsigned char drive = -1;
 	drive_params_t p;
 
+	setup();
 	asm volatile("" : "=d"(drive));
-
-	setup(0x0000);
 	get_drive_params(drive, &p);
 
 	printf("Hello world!\r\n");
