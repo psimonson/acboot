@@ -13,7 +13,6 @@ SectorsPerTrack db 18
 NumHeads db 2
 
 _start:
-	mov byte [drive], dl
 	cli
 	mov ax, 0x07c0
 	mov ds, ax
@@ -23,8 +22,11 @@ _start:
 
 	xor ax, ax
 	mov ss, ax
-	mov sp, 0xffff
+	mov sp, 0x7c00
 	sti
+
+	; store bios drive
+	mov byte [drive], dl
 
 	; check if it's an 8086/80186/80286/80386
 	mov cx, 0121h
@@ -64,7 +66,7 @@ _start:
 	cmp dx, 1
 	je .error
 	mov dl, byte [drive]
-	jmp 0x0050:0x0000
+	jmp 0x0100:0x0000
 
 .error:
 	call reboot
@@ -103,7 +105,7 @@ load_kernel:
 .match:
 	mov ax, word [bx+13]
 	mov cx, word [bx+11]
-	mov bx, 0x0050
+	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
 	call read_sectors

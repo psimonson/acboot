@@ -23,8 +23,8 @@ void main(void)
 	struct file *entry;
 	drive_params_t p;
 
+	setup(0x0100);
 	asm volatile("" : "=d"(drive));
-	setup(0x0050);
 	get_drive_params(drive, &p);
 
 	printf("BIOS drive: %d\r\n", p.drive);
