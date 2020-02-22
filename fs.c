@@ -76,10 +76,15 @@ void exec_file(const drive_params_t *p, const struct file *entry)
 	int num_read = 0;
 
 	reset_disk(p);
+	asm volatile(
+		"movw $0x1000, %bx\n"
+		"movw %bx, %es\n"
+		"xorw %bx, %bx\n"
+	);
 	if((num_read = read_disk(e, p, start_sector, num_sectors))
 			== num_sectors) {
 		asm volatile("" : : "d"(p->drive));
-		goto *e;
+		asm volatile("jmp %0" : : "m"(e));
 	}
 
 	printf("Binary could not be loaded.\r\n"

@@ -63,13 +63,9 @@ __REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 	h = (lba % (p->numh * p->spt)) / p->spt;
 
 	asm volatile(
-		"push %%bx\n"
-		"push %%es\n"
 		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		"pop %%es\n"
-		"pop %%bx\n"
 		: "=r"(failed), "=a"(status)
 		: "a"(0x0200 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)
@@ -95,13 +91,9 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 	h = (lba % (p->numh * p->spt)) / p->spt;
 
 	asm volatile(
-		"push %%bx\n"
-		"push %%es\n"
 		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		"pop %%es\n"
-		"pop %%bx\n"
 		: "=r"(failed), "=a"(status)
 		: "a"(0x0300 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)

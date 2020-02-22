@@ -1,10 +1,13 @@
 CC=gcc
-CFLAGS=-std=gnu89 -Wall -Wextra -Wno-unused-parameter
+CFLAGS=-std=gnu89 -Wall -Wno-unused-parameter
 LDFLAGS=
 KERNEL=no
 ifeq ($(KERNEL),yes)
-CFLAGS+=-m16 -fno-builtin -nostdlib -ffreestanding -fno-stack-protector
-LDFLAGS=-m elf_i386
+CFLAGS+=-march=i686 -o -oS -ffreestanding -I. -m16
+CFLAGS+=-fno-asynchronous-unwind-tables -fno-pic -fno-pie -fno-builtin
+CFLAGS+=-fomit-frame-pointer -ffunction-sections -fdata-sections -fno-ident
+CFLAGS+=-fno-stack-protector
+LDFLAGS=-static -s -Os -m elf_i386 -no-pie -nostartfiles --nmagic
 DEBUG?=no
 ifeq ($(DEBUG),yes)
 DEBUG=--strip-debug
@@ -29,13 +32,13 @@ io.elf: io.c.o stdio.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -T io.ld -o $@ $^
 
 shell.elf: shell.c.o stdio.c.o disk.c.o fs.c.o
-	$(LD) $(LDFLAGS) -T shell.ld -o $@ $^
+	$(LD) $(LDFLAGS) -N -T shell.ld -o $@ $^
 
 graph.elf: graph.c.o stdio.c.o disk.c.o
-	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
+	$(LD) $(LDFLAGS) -N -T link.ld -o $@ $^
 
 hello.elf: hello.c.o stdio.c.o disk.c.o
-	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
+	$(LD) $(LDFLAGS) -N -T link.ld -o $@ $^
 
 IO.SYS: io.elf
 	objcopy $(DEBUG_INFO) -O binary $^ $@
