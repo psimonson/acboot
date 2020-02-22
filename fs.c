@@ -62,7 +62,7 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 	for(i = 0; i < MAXFILES; i++) {
 		entry = (struct file *)&ftable[i*16];
 		if(entry->filename[0] != 0xf7 || entry->filename[0] != 0x00) {
-			if(memcmp(filename, entry->filename, 11) == 0)
+			if(memcmp(get_filename_user(filename), entry->filename, 11) == 0)
 				return entry;
 		}
 	}
@@ -80,8 +80,13 @@ void exec_file(const drive_params_t *p, const struct file *entry)
 	reset_disk(p);
 	if((num_read = read_disk(e, p, start_sector, num_sectors))
 			== num_sectors) {
-		asm volatile("" : : "d"(p->drive));
-		goto *e;
+		asm volatile(
+			"movb %0, %%dl\n"
+			"pusha\n"
+			"call $0x1000, $0x0000\n"
+			"popa\n"
+			: : "r"(p->drive)
+		);
 	}
 
 	printf("Binary could not be loaded.\r\n"

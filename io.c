@@ -35,7 +35,7 @@ void main(void)
 
 	printf("BIOS drive: %d\r\n", p.drive);
 	if((table = get_ftable(&p)) != NULL) {
-		const char *filename = "SHELL   APP";
+		const char *filename = "SHELL.APP";
 		if((entry = search_file(table, filename)) != NULL)
 			exec_file(&p, entry);
 		else
