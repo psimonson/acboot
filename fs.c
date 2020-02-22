@@ -61,8 +61,11 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 
 	for(i = 0; i < MAXFILES; i++) {
 		entry = (struct file *)&ftable[i*16];
-		if(memcmp(get_filename_user(filename), entry->filename, 11) == 0)
-			return entry;
+		if(entry->filename[0] != 0xf7 || entry->filename[0] != 0x00) {
+			const char *fname = get_filename_user(filename);
+			if(memcmp(fname, entry->filename, 11) == 0)
+				return entry;
+		}
 	}
 	return NULL;
 }

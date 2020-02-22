@@ -18,9 +18,13 @@ __REGPARM int get_drive_params(const unsigned char drive, drive_params_t *p)
 	unsigned short tmp1, tmp2;
 
 	asm volatile(
+		"push %%ds\n"
+		"push %%es\n"
 		"mov $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
+		"pop %%es\n"
+		"pop %%ds\n"
 		: "=r"(failed), "=c"(tmp1), "=d"(tmp2)
 		: "a"(0x0800), "d"(0x0000 | drive), "D"(0)
 		: "cc", "bx"
@@ -39,9 +43,13 @@ __REGPARM int reset_disk(const drive_params_t *p)
 {
 	unsigned char failed = 0;
 	asm volatile(
+		"push %%ds\n"
+		"push %%es\n"
 		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
+		"pop %%es\n"
+		"pop %%ds\n"
 		: "=r"(failed)
 		: "a"(0x0000), "d"(0x0000 | p->drive)
 		: "cc"
