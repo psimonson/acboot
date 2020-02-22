@@ -1,8 +1,7 @@
 ENTRY(main);
 SECTIONS
 {
-	. = 0x0100;
-	.text :
+	.text : AT(0x0100)
 	{
 		*(.text);
 	}
