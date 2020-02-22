@@ -11,7 +11,6 @@
 
 #include "attr.h"
 
-__REGPARM void setup(void);
 __REGPARM void getcur(unsigned char *x, unsigned char *y);
 __REGPARM void mvcur(unsigned char x, unsigned char y);
 __REGPARM void clrscr(unsigned char mode);

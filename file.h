@@ -17,7 +17,7 @@
 #define SHELL_SECTORS 16
 /* some defines for graph app */
 #define GRAPH_START (SHELL_START+SHELL_SECTORS)+1
-#define GRAPH_SECTORS 11
+#define GRAPH_SECTORS 10
 /* some defines for hello app */
 #define HELLO_START (GRAPH_START+GRAPH_SECTORS)+1
 #define HELLO_SECTORS 9

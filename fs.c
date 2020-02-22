@@ -12,7 +12,7 @@ asm(".code16gcc");
 #include "disk.h"
 #include "fs.h"
 
-#define SHELL_ENTRY 0x8000
+#define SHELL_ENTRY 0x1000
 
 /* Get file name from entry.
  */
@@ -36,18 +36,18 @@ char *get_filename(const struct file *entry)
  */
 char *get_filename_user(const char *filename)
 {
-	static char converted[12];
+	static char converted[13];
 	int i, j;
 
-	memset(converted, 0, 11);
+	memset(converted, 0, 13);
 	for(i = 0, j = 0;
-		j < 8 && filename[j] != '.';
+		j < 8 && (filename[j] != '.' || filename[j] != ' ');
 		i++, j++)
 		converted[i] = filename[j];
-	while(i < 8 && filename[j] == '.')
+	while(i < 8 && (filename[j] == '.' || filename[j] == ' '))
 		converted[i++] = ' ';
 	++j;
-	for( ; j < 11 && filename[j] != ' '; j++, i++)
+	for(; j < 11 && filename[j] != ' '; j++, i++)
 		converted[i] = filename[j];
 	converted[i] = '\0';
 	return converted;
@@ -62,8 +62,7 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 	for(i = 0; i < MAXFILES; i++) {
 		entry = (struct file *)&ftable[i*16];
 		if(entry->filename[0] != 0xf7 || entry->filename[0] != 0x00) {
-			const char *fname = get_filename_user(filename);
-			if(memcmp(fname, entry->filename, 11) == 0)
+			if(memcmp(filename, entry->filename, 11) == 0)
 				return entry;
 		}
 	}

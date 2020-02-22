@@ -17,9 +17,8 @@ _start:
 	mov ax, 0x07c0
 	mov ds, ax
 	mov es, ax
-	mov ax, 0x8000
 	mov ss, ax
-	mov sp, 0x9000
+	mov sp, 0xfffe
 	sti
 
 	; store bios drive

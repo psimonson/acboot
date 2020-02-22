@@ -12,19 +12,6 @@ asm(".code16gcc");
 #include <stdarg.h>
 #include "stdio.h"
 
-/* Setup for initial segments.
- */
-__REGPARM void setup(void)
-{
-	asm volatile(
-		"movw %cs, %ax\n"
-		"movw %ax, %ds\n"
-		"movw %ax, %es\n"
-		"movw %ax, %fs\n"
-		"movw %ax, %gs\n"
-		"movw %ax, %ss\n"
-	);
-}
 /* Get cursor position on screen.
  */
 __REGPARM void getcur(unsigned char *x, unsigned char *y)

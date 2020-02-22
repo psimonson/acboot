@@ -22,8 +22,14 @@ void main(void)
 	unsigned char drive = -1;
 	drive_params_t p;
 
-	setup();
-	asm volatile("" : "=d"(drive));
+	asm volatile(
+		"movb %%dl, %0\n"
+		"movw %%cs, %%ax\n"
+		"movw %%ax, %%ds\n"
+		"movw %%ax, %%es\n"
+		"movw %%ax, %%ss\n"
+		: "=r"(drive)
+	);
 	get_drive_params(drive, &p);
 	printf("Hello world!\r\n");
 	asm volatile("" : : "d"(p.drive));

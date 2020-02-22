@@ -23,14 +23,20 @@ void main(void)
 	struct file *entry = NULL;
 	drive_params_t p;
 
-	setup();
-	asm volatile("" : "=d"(drive));
+	asm volatile(
+		"movb %%dl, %0\n"
+		"movw %%cs, %%ax\n"
+		"movw %%ax, %%ds\n"
+		"movw %%ax, %%es\n"
+		"movw %%ax, %%ss\n"
+		: "=r"(drive)
+	);
 	get_drive_params(drive, &p);
 
 	printf("BIOS drive: %d\r\n", p.drive);
 	if((table = get_ftable(&p)) != NULL) {
-		const char *filename = "SHELL.APP";
-		if((entry = search_file(table, get_filename_user(filename))) != NULL)
+		const char *filename = "SHELL   APP";
+		if((entry = search_file(table, filename)) != NULL)
 			exec_file(&p, entry);
 		else
 			printf("File: %s Not found.\r\n", filename);
