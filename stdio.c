@@ -12,7 +12,7 @@ asm(".code16gcc");
 #include <stdarg.h>
 #include "stdio.h"
 
-/* Setup segment registers for my simple operating system.
+/* Setup for initial segments.
  */
 __REGPARM void setup(void)
 {
@@ -20,6 +20,9 @@ __REGPARM void setup(void)
 		"movw %cs, %ax\n"
 		"movw %ax, %ds\n"
 		"movw %ax, %es\n"
+		"movw %ax, %fs\n"
+		"movw %ax, %gs\n"
+		"movw %ax, %ss\n"
 	);
 }
 /* Get cursor position on screen.

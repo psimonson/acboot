@@ -169,7 +169,6 @@ void main(void)
 	asm volatile("" : "=d"(drive));
 	get_drive_params(drive, &p);
 	loop(&p);
-
 	printf("Halting system...\r\n");
 	asm volatile("hlt");
 }

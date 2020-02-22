@@ -19,8 +19,8 @@ asm("jmp main");
 void main(void)
 {
 	unsigned char drive = -1;
-	unsigned char *table;
-	struct file *entry;
+	unsigned char *table = NULL;
+	struct file *entry = NULL;
 	drive_params_t p;
 
 	setup();
@@ -30,7 +30,7 @@ void main(void)
 	printf("BIOS drive: %d\r\n", p.drive);
 	if((table = get_ftable(&p)) != NULL) {
 		const char *filename = "SHELL.APP";
-		if((entry = search_file(table, filename)) != NULL)
+		if((entry = search_file(table, get_filename_user(filename))) != NULL)
 			exec_file(&p, entry);
 		else
 			printf("File: %s Not found.\r\n", filename);

@@ -6,11 +6,13 @@
  ********************************************************************
  */
 
-asm(".code16gcc\n");
+asm(".code16gcc");
 
 #include "stdio.h"
 #include "disk.h"
 #include "fs.h"
+
+#define SHELL_ENTRY 0x0100
 
 /* Get file name from entry.
  */
@@ -58,9 +60,8 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 	int i;
 
 	for(i = 0; i < MAXFILES; i++) {
-		const char *fname = get_filename_user(filename);
 		entry = (struct file *)&ftable[i*16];
-		if(memcmp(fname, entry->filename, 11) == 0)
+		if(memcmp(filename, entry->filename, 11) == 0)
 			return entry;
 	}
 	return NULL;
