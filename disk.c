@@ -58,14 +58,16 @@ __REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 	unsigned char c, h, s;
 
 	/* LBA to CHS value */
-	s = ((lba % (p->numh * p->spt)) % p->spt) + 1;
-	c = lba / (p->numh * p->spt);
-	h = (lba % (p->numh * p->spt)) / p->spt;
+	lba_chs(p, lba, &c, &h, &s);
 
 	asm volatile(
+		"push %%ds\n"
+		"push %%es\n"
 		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
+		"pop %%es\n"
+		"pop %%ds\n"
 		: "=r"(failed), "=a"(status)
 		: "a"(0x0200 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)
@@ -86,14 +88,16 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 	unsigned char c, h, s;
 
 	/* LBA to CHS value */
-	s = ((lba % (p->numh * p->spt)) % p->spt) + 1;
-	c = lba / (p->numh * p->spt);
-	h = (lba % (p->numh * p->spt)) / p->spt;
+	lba_chs(p, lba, &c, &h, &s);
 
 	asm volatile(
+		"push %%ds\n"
+		"push %%es\n"
 		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
+		"pop %%es\n"
+		"pop %%ds\n"
 		: "=r"(failed), "=a"(status)
 		: "a"(0x0300 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)
@@ -114,4 +118,14 @@ __REGPARM void *get_ftable(const drive_params_t *p)
 		return sector;
 	reset_disk(p);
 	return NULL;
+}
+/* Convert Logical block addressing to CHS.
+ */
+__REGPARM void lba_chs(const drive_params_t *p, unsigned int lba,
+	unsigned char *c, unsigned char *h, unsigned char *s)
+{
+	unsigned int temp = lba / p->spt;
+	*c = temp / p->numh;
+	*h = temp % p->numh;
+	*s = (lba % p->spt) + 1;
 }
