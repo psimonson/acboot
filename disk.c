@@ -10,6 +10,8 @@ asm(".code16gcc");
 
 #include "disk.h"
 
+static unsigned char _file_table[BLOCK_SIZE];
+
 /* Get drive parameters from BIOS.
  */
 __REGPARM int get_drive_params(const unsigned char drive, drive_params_t *p)
@@ -118,20 +120,24 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 		return 0;
 	return (status & 0x00ff);
 }
-/* Get my file system table from disk.
+/* Load my file system table from disk.
  */
-__REGPARM void *get_ftable(const drive_params_t *p)
+void *load_table(const drive_params_t *p)
 {
-	static unsigned char sector[BLOCK_SIZE];
 	reset_disk(p);
-	if(read_disk(sector, p, 1, 1) == 1)
-		return sector;
-	reset_disk(p);
+	if(read_disk(_file_table, p, 1, 1) == 1)
+		return _file_table;
 	return NULL;
+}
+/* Get my file system table from memory.
+ */
+void *get_table(void)
+{
+	return _file_table;
 }
 /* Convert Logical block addressing to CHS.
  */
-__REGPARM void lba_chs(const drive_params_t *p, unsigned int lba,
+void lba_chs(const drive_params_t *p, unsigned int lba,
 	unsigned char *c, unsigned char *h, unsigned char *s)
 {
 	unsigned int temp = lba / p->spt;

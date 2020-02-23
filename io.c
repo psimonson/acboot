@@ -31,15 +31,19 @@ void main(void)
 		"movb %%dl, %0\n"
 		: "=r"(drive)
 	);
-	get_drive_params(drive, &p);
 
-	printf("BIOS drive: %d\r\n", p.drive);
-	if((table = get_ftable(&p)) != NULL) {
-		const char *filename = get_filename_user("SHELL.APP");
-		if((entry = search_file(table, filename)) != NULL)
-			exec_file(&p, entry);
-		else
-			printf("File: %s Not found.\r\n", filename);
+	if(drive >= 0 && drive <= 0xff) {
+		get_drive_params(drive, &p);
+		table = load_table(&p);
+		printf("BIOS drive: %d\r\n", p.drive);
+		if(table != NULL) {
+			const char *filename = get_filename_user("SHELL.APP");
+			if((entry = search_file(table, filename)) != NULL)
+				exec_file(&p, entry);
+			else {
+				printf("File: %s Not found.\r\n", filename);
+			}
+		}
 	}
 
 	type("Press any key to reboot...\r\n");

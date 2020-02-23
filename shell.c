@@ -73,14 +73,14 @@ int cmd_help(const drive_params_t *UNUSED(p))
  */
 int cmd_list(const drive_params_t *p)
 {
-	list_files(p);
+	list_files();
 	return 0;
 }
 /* Search for a file in the root of the drive.
  */
 int cmd_find(const drive_params_t *p)
 {
-	const unsigned char *table = get_ftable(p);
+	const unsigned char *table = get_table();
 	char buf[32];
 	printf("Enter file name: ");
 	gets(buf, sizeof(buf));
@@ -103,7 +103,7 @@ int cmd_exec(const drive_params_t *p)
 	if(memcmp(buf, "IO.SYS", 6) == 0 || memcmp(buf, "SHELL.APP", 9) == 0)
 		printf("Cannot execute, %s is a system file.\r\n", buf);
 	else {
-		if((table = get_ftable(p)) != NULL) {
+		if((table = get_table()) != NULL) {
 			if((entry = search_file(table, buf)) != NULL) {
 					exec_file(p, entry);
 			} else {
@@ -175,8 +175,12 @@ void main(void)
 		"movb %%dl, %0\n"
 		: "=r"(drive)
 	);
-	get_drive_params(drive, &p);
-	loop(&p);
+
+	if(drive >= 0 && drive <= 0xff) {
+		get_drive_params(drive, &p);
+		(void)load_table(&p);
+		loop(&p);
+	}
 	printf("Halting system...\r\n");
 	asm volatile("hlt");
 }

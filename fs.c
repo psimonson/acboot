@@ -93,15 +93,15 @@ void exec_file(const drive_params_t *p, const struct file *entry)
 }
 /* List root directory (all files).
  */
-void list_files(const drive_params_t *p)
+void list_files(void)
 {
-	unsigned char *table = get_ftable(p);
+	unsigned char *table = get_table();
 	if(table != NULL) {
 		int i, count = 0;
 
 		for(i = 0; i < MAXFILES; i++) {
 			struct file *entry = (struct file *)&table[i*16];
-			if(entry->filename[0] == 0xf7) continue;
+			if(entry->filename[0] == 0xf7 || entry->filename[0] == 0x00) continue;
 			printf("%s [Sectors occuped: %d, Starting sector: %d]\r\n",
 				get_filename(entry), entry->num_sectors, entry->start);
 			count++;

@@ -32,9 +32,11 @@ __REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 	unsigned int lba, unsigned char blocks);
 /* read my file system table from disk */
-__REGPARM void *get_ftable(const drive_params_t *p);
+void *load_table(const drive_params_t *p);
+/* get pointer to my file system table after load_table call */
+void *get_table(void);
 /* convert LBA to CHS value */
-__REGPARM void lba_chs(const drive_params_t *p, unsigned int lba,
-	unsigned char *c, unsigned char *h, unsigned char *s);
+void lba_chs(const drive_params_t *p, unsigned int lba, unsigned char *c,
+	unsigned char *h, unsigned char *s);
 
 #endif

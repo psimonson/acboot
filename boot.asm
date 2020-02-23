@@ -17,8 +17,6 @@ _start:
 	mov ax, 0x07c0
 	mov ds, ax
 	mov es, ax
-	mov fs, ax
-	mov gs, ax
 	mov ss, ax
 	mov sp, 0xfffe
 	sti
@@ -90,10 +88,10 @@ load_kernel:
 	mov bx, word [root]
 	xor cx, cx
 .next:
-	mov al, byte [bx]
-	cmp al, 0xf7
+	mov ax, word [bx]
+	cmp ax, 0xf7
 	je .no_match
-	cmp al, 0x0
+	cmp ax, 0x0
 	je .error
 	mov si, kernel
 	mov di, bx
@@ -101,8 +99,8 @@ load_kernel:
 	rep cmpsb
 	jne .no_match
 .match:
-	mov ax, word [bx+13]
-	mov cx, word [bx+11]
+	mov ax, word [bx+14]
+	mov cx, word [bx+12]
 	mov bx, 0x0050
 	mov es, bx
 	xor bx, bx
