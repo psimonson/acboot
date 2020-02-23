@@ -166,11 +166,13 @@ void main(void)
 	drive_params_t p;
 
 	asm volatile(
-		"movb %%dl, %0\n"
 		"movw %%cs, %%ax\n"
 		"movw %%ax, %%ds\n"
 		"movw %%ax, %%es\n"
+		"movw %%ax, %%fs\n"
+		"movw %%ax, %%gs\n"
 		"movw %%ax, %%ss\n"
+		"movb %%dl, %0\n"
 		: "=r"(drive)
 	);
 	get_drive_params(drive, &p);
