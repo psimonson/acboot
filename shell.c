@@ -80,11 +80,10 @@ int cmd_list(const drive_params_t *p)
  */
 int cmd_find(const drive_params_t *p)
 {
-	const unsigned char *table = get_table();
 	char buf[32];
 	printf("Enter file name: ");
 	gets(buf, sizeof(buf));
-	if(search_file(table, buf) != NULL)
+	if(search_file(buf) != NULL)
 		printf("File %s found.\r\n", buf);
 	else
 		printf("File %s not found.\r\n", buf);
@@ -94,7 +93,6 @@ int cmd_find(const drive_params_t *p)
  */
 int cmd_exec(const drive_params_t *p)
 {
-	unsigned char *table;
 	struct file *entry;
 	char buf[32];
 
@@ -103,13 +101,10 @@ int cmd_exec(const drive_params_t *p)
 	if(memcmp(buf, "IO.SYS", 6) == 0 || memcmp(buf, "SHELL.APP", 9) == 0)
 		printf("Cannot execute, %s is a system file.\r\n", buf);
 	else {
-		if((table = get_table()) != NULL) {
-			if((entry = search_file(table, buf)) != NULL) {
-					exec_file(p, entry);
-			} else {
-				printf("App not found.\r\n");
-			}
-		}
+		if((entry = search_file(buf)) != NULL)
+			exec_file(p, entry);
+		else
+			printf("App not found.\r\n");
 	}
 	return 0;
 }

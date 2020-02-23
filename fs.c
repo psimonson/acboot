@@ -53,13 +53,14 @@ char *get_filename_user(const char *filename)
 }
 /* Search for file in file system and return if found.
  */
-struct file *search_file(const unsigned char *ftable, const char *filename)
+struct file *search_file(const char *filename)
 {
+	unsigned char *table = get_table();
 	struct file *entry;
 	int i;
 
 	for(i = 0; i < MAXFILES; i++) {
-		entry = (struct file *)&ftable[i*16];
+		entry = (struct file *)&table[i*16];
 		if(entry->filename[0] != 0xf7 || entry->filename[0] != 0x00) {
 			if(memcmp(filename, entry->filename, 11) == 0)
 				return entry;
