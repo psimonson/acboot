@@ -37,17 +37,16 @@ char *get_filename(const struct file *entry)
 char *get_filename_user(const char *filename)
 {
 	static char converted[13];
-	int i, j;
+	int i, j, len = strlen(filename);
 
 	memset(converted, 0, 13);
 	for(i = 0, j = 0;
-		j < 8 && (filename[j] != '.' || filename[j] != ' ');
-		i++, j++)
+		j < 8 && filename[j] != '.'; i++,j++)
 		converted[i] = filename[j];
-	while(i < 8 && (filename[j] == '.' || filename[j] == ' '))
+	while(i < 8 && filename[j] == '.')
 		converted[i++] = ' ';
 	++j;
-	for(; j < 11 && filename[j] != ' '; j++, i++)
+	for(; i <= 11 || (j <= len && filename[j] != ' '); i++,j++)
 		converted[i] = filename[j];
 	converted[i] = '\0';
 	return converted;
@@ -62,7 +61,7 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
 	for(i = 0; i < MAXFILES; i++) {
 		entry = (struct file *)&ftable[i*16];
 		if(entry->filename[0] != 0xf7 || entry->filename[0] != 0x00) {
-			if(memcmp(get_filename_user(filename), entry->filename, 11) == 0)
+			if(memcmp(filename, entry->filename, 11) == 0)
 				return entry;
 		}
 	}

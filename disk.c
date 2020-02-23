@@ -71,14 +71,15 @@ __REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 	asm volatile(
 		"push %%ds\n"
 		"push %%es\n"
+		"movw %[buf], %%es\n"
 		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
 		"pop %%es\n"
 		"pop %%ds\n"
 		: "=r"(failed), "=a"(status)
-		: "a"(0x0200 | blocks), "b"(buffer), "c"((c << 8) | s),
-			"d"((h << 8) | p->drive)
+		: "a"(0x0200 | blocks), [buf]"r"(buffer), "c"((c << 8) | s),
+			"d"((h << 8) | p->drive), "b"(0x0000)
 		: "cc"
 	);
 
@@ -101,14 +102,15 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 	asm volatile(
 		"push %%ds\n"
 		"push %%es\n"
+		"movw %[buf], %%es\n"
 		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
 		"pop %%es\n"
 		"pop %%ds\n"
 		: "=r"(failed), "=a"(status)
-		: "a"(0x0300 | blocks), "b"(buffer), "c"((c << 8) | s),
-			"d"((h << 8) | p->drive)
+		: "a"(0x0300 | blocks), [buf]"r"(buffer), "c"((c << 8) | s),
+			"d"((h << 8) | p->drive), "b"(0x0000)
 		: "cc"
 	);
 
