@@ -36,12 +36,13 @@ void main(void)
 		(void)load_table(&p);
 		printf("BIOS drive: %d\r\n", p.drive);
 		{
-			const char *filename = get_filename_user("SHELL.APP");
+			dump_table();
+/*			const char *filename = get_filename_user("SHELL.APP");
 			if((entry = search_file(filename)) != NULL)
 				exec_file(&p, entry);
 			else
 				printf("File: %s Not found.\r\n", filename);
-		}
+*/		}
 	}
 
 	type("Press any key to reboot...\r\n");

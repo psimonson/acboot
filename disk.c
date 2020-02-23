@@ -10,7 +10,10 @@ asm(".code16gcc");
 
 #include "disk.h"
 
+/* File table storage */
 static unsigned char _file_table[BLOCK_SIZE];
+/* File table loaded ?? */
+static char _table_loaded;
 
 /* Get drive parameters from BIOS.
  */
@@ -125,15 +128,37 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 void *load_table(const drive_params_t *p)
 {
 	reset_disk(p);
-	if(read_disk(_file_table, p, 1, 1) == 1)
+	if(read_disk(_file_table, p, 1, 1) == 1) {
+		_table_loaded = 1;
 		return _file_table;
+	}
 	return NULL;
 }
 /* Get my file system table from memory.
  */
 void *get_table(void)
 {
-	return _file_table;
+	return (_table_loaded ? _file_table : NULL);
+}
+/* Dump table to standard output.
+ */
+void dump_table(void)
+{
+	int i, j;
+	if(_table_loaded == 0) {
+		printf("Table isn't loaded call load_table first!\r\n");
+		return;
+	}
+	for(i = 0, j = 0; i < BLOCK_SIZE; i++) {
+		if((i % 30) == 0) {
+			j++;
+			printf("\r\n");
+		} else {
+			printf("%x ", _file_table[i]);
+		}
+		if((j % 20) == 0) getc();
+	}
+	printf("\r\n");
 }
 /* Convert Logical block addressing to CHS.
  */
