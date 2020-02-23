@@ -14,12 +14,12 @@
 #define IO_SECTORS	13		/* total operating system sectors */
 /* some defines for binary app */
 #define SHELL_START (IO_START+IO_SECTORS)+1
-#define SHELL_SECTORS 16
+#define SHELL_SECTORS 17
 /* some defines for graph app */
 #define GRAPH_START (SHELL_START+SHELL_SECTORS)+1
-#define GRAPH_SECTORS 11
+#define GRAPH_SECTORS 12
 /* some defines for hello app */
 #define HELLO_START (GRAPH_START+GRAPH_SECTORS)+1
-#define HELLO_SECTORS 9
+#define HELLO_SECTORS 10
 
 #endif
