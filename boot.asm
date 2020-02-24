@@ -9,39 +9,18 @@
 jmp short _start
 nop
 
-OEMid db "ACBOOT01"
-BytesPerSector dw 512
-SectorsPerCluster db 1
-ReservedCount db 1
-FTCount db 1
-DirEntries db 32
-TotalSectors db 2880
-MediaDescriptor db 0xf0
-Reserved1 db 0
 SectorsPerTrack db 18
 NumHeads db 2
-HiddenSectors db 0
-dd 0 ; padding
-Drive db 0
-DirtyBit db 1
-extBootSig db 0x29
-VolumeID	dd 0x01baddad
-VolumeLabel db "AC Boot    "
-FSType      db "SimpleFS"
 
 _start:
-	cli
+	mov byte [drive], dl
 	mov ax, cs
 	mov ds, ax
 	mov es, ax
-	mov fs, ax
-	mov gs, ax
+	cli
 	mov ss, ax
-	mov sp, 0xfffe
+	mov sp, 0xffff
 	sti
-
-	; store bios drive
-	mov byte [drive], dl
 
 	; check if it's an 8086/80186/80286/80386
 	mov cx, 0121h
@@ -107,10 +86,10 @@ load_kernel:
 	mov bx, word [root]
 	xor cx, cx
 .next:
-	mov ax, word [bx]
-	cmp ax, 0xf7
+	mov al, byte [bx]
+	cmp al, 0xf7
 	je .no_match
-	cmp ax, 0x0
+	cmp al, 0x0
 	je .error
 	mov si, kernel
 	mov di, bx
@@ -206,18 +185,19 @@ reboot:
 
 ; data
 loading db "Loading system",24h
-done db 0ah,0dh,"Done!",0ah,0dh,24h
-reboot_msg db "Press any key to retry...",0ah,0dh,24h
+done db 0ah,0dh,"Done loading!",0ah,0dh,24h
+reboot_msg db "Press any key to try again...",0ah,0dh,24h
 error db "Disk read error.",0ah,0dh,24h
+crlf db 0ah,0dh,24h
 drive db 0
 kernel db "IO      SYS"
 root dw 0x0200
-absTrack db 0
-absSector db 0
-absHead db 0
+absTrack dw 0
+absSector dw 0
+absHead dw 0
 progress db 2eh,24h
-fail db 0ah,0dh,"Disk read error.",0ah,0dh,24h
-not_supported db "Not a 80386 or newer processor.",0ah,0dh,24h
+fail db 0ah,0dh,"Disk read error :(",0ah,0dh,24h
+not_supported db "You need atleast a 80386 processor.",0ah,0dh,24h
 
 times 510-($-$$) db 0
 dw 0xaa55

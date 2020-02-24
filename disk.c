@@ -11,11 +11,6 @@ asm(".code16gcc");
 #include "stdio.h"
 #include "disk.h"
 
-/* File table storage */
-static unsigned char _file_table[BLOCK_SIZE];
-/* File table loaded ?? */
-static char _table_loaded;
-
 /* Get drive parameters from BIOS.
  */
 __REGPARM int get_drive_params(const unsigned char drive, drive_params_t *p)
@@ -108,34 +103,31 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
  */
 void *load_table(const drive_params_t *p)
 {
-	reset_disk(p);
-	if(read_disk(_file_table, p, 1, 1) == 1) {
-		_table_loaded = 1;
-		return _file_table;
+	static unsigned char sector[BLOCK_SIZE];
+	static unsigned char loaded = 0;
+
+	if(loaded == 0) {
+		reset_disk(p);
+		if(read_disk(sector, p, 1, 1) == 1) {
+			loaded = 1;
+			return sector;
+		} else {
+			return NULL;
+		}
 	}
-	return NULL;
-}
-/* Get my file system table from memory.
- */
-void *get_table(void)
-{
-	return (_table_loaded ? _file_table : NULL);
+	return sector;
 }
 /* Dump table to standard output.
  */
-void dump_table(void)
+void dump_table(const unsigned char table[])
 {
 	int i, j;
-	if(_table_loaded == 0) {
-		printf("Table isn't loaded call load_table first!\r\n");
-		return;
-	}
 	for(i = 0, j = 0; i < BLOCK_SIZE; i++) {
 		if((i % 30) == 0) {
 			j++;
 			printf("\r\n");
 		} else {
-			printf("%x ", _file_table[i]);
+			printf("%x ", table[i]);
 		}
 		if((j % 20) == 0) getc();
 	}
@@ -150,4 +142,5 @@ void lba_chs(const drive_params_t *p, unsigned int lba,
 	*c = temp / p->numh;
 	*h = temp % p->numh;
 	*s = (lba % p->spt) + 1;
+	printf("*** [C:%d,H:%d,S:%d] ***\r\n", *c, *h, *s);
 }

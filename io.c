@@ -27,10 +27,11 @@ void main(void)
 
 	if(drive >= 0 && drive <= 0xff) {
 		get_drive_params(drive, &p);
-		(void)load_table(&p);
 		printf("BIOS drive: %d\r\n", p.drive);
+
 		{
-			dump_table();
+			unsigned char *table = load_table(&p);
+			dump_table(table);
 /*			const char *filename = get_filename_user("SHELL.APP");
 			if((entry = search_file(filename)) != NULL)
 				exec_file(&p, entry);

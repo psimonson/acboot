@@ -53,9 +53,8 @@ char *get_filename_user(const char *filename)
 }
 /* Search for file in file system and return if found.
  */
-struct file *search_file(const char *filename)
+struct file *search_file(const unsigned char table[], const char *filename)
 {
-	unsigned char *table = get_table();
 	struct file *entry;
 	int i;
 
@@ -80,13 +79,8 @@ void exec_file(const drive_params_t *p, const struct file *entry)
 	reset_disk(p);
 	if((num_read = read_disk(e, p, start_sector, num_sectors))
 			== num_sectors) {
-		asm volatile(
-			"movb %0, %%dl\n"
-			"pusha\n"
-			"call $0x1000, $0x0000\n"
-			"popa\n"
-			: : "r"(p->drive)
-		);
+		asm volatile("movb %0, %%dl\n" : : "r"(p->drive));
+		goto *e;
 	}
 
 	printf("Binary could not be loaded.\r\n"
@@ -94,21 +88,16 @@ void exec_file(const drive_params_t *p, const struct file *entry)
 }
 /* List root directory (all files).
  */
-void list_files(void)
+void list_files(const unsigned char *table)
 {
-	unsigned char *table = get_table();
-	if(table != NULL) {
-		int i, count = 0;
+	int i, count = 0;
 
-		for(i = 0; i < MAXFILES; i++) {
-			struct file *entry = (struct file *)&table[i*16];
-			if(entry->filename[0] == 0xf7 || entry->filename[0] == 0x00) continue;
-			printf("%s [Sectors occuped: %d, Starting sector: %d]\r\n",
-				get_filename(entry), entry->num_sectors, entry->start);
-			count++;
-		}
-		printf("Total files in root: %d\r\n", count);
-		return;
+	for(i = 0; i < MAXFILES; i++) {
+		struct file *entry = (struct file *)&table[i*16];
+		if(entry->filename[0] == 0xf7 || entry->filename[0] == 0x00) continue;
+		printf("%s [Sectors occuped: %d, Starting sector: %d]\r\n",
+			get_filename(entry), entry->num_sectors, entry->start);
+		count++;
 	}
-	printf("No files on the current disk.\r\n");
+	printf("Total files in root: %d\r\n", count);
 }
