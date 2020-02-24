@@ -29,14 +29,8 @@ void main(void)
 	unsigned short cnt1 = 0, cnt2 = 0;
 	unsigned color = 10;
 
-	asm volatile(
-		"movb %%dl, %0\n"
-		"movw %%cs, %%ax\n"
-		"movw %%ax, %%ds\n"
-		"movw %%ax, %%es\n"
-		"movw %%ax, %%ss\n"
-		: "=r"(drive)
-	);
+	setup();
+	asm volatile("movb %%dl, %0\n" : "=r"(drive));
 	get_drive_params(drive, &p);
 	clrscr(0x03);
 	printf("This is a graphics demonstration it waits until a\r\n"

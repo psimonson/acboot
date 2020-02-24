@@ -22,16 +22,8 @@ void main(void)
 	struct file *entry = NULL;
 	drive_params_t p;
 
-	asm volatile(
-		"movw %%cs, %%ax\n"
-		"movw %%ax, %%ds\n"
-		"movw %%ax, %%es\n"
-		"movw %%ax, %%fs\n"
-		"movw %%ax, %%gs\n"
-		"movw %%ax, %%ss\n"
-		"movb %%dl, %0\n"
-		: "=r"(drive)
-	);
+	setup();
+	asm volatile("movb %%dl, %0\n" : "=r"(drive));
 
 	if(drive >= 0 && drive <= 0xff) {
 		get_drive_params(drive, &p);
