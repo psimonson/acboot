@@ -6,11 +6,28 @@
 [bits 16]
 [org 0x0]
 
-nop
 jmp short _start
+nop
 
+OEMid db "ACBOOT01"
+BytesPerSector dw 512
+SectorsPerCluster db 1
+ReservedCount db 1
+FTCount db 1
+DirEntries db 32
+TotalSectors db 2880
+MediaDescriptor db 0xf0
+Reserved1 db 0
 SectorsPerTrack db 18
 NumHeads db 2
+HiddenSectors db 0
+dd 0 ; padding
+Drive db 0
+DirtyBit db 1
+extBootSig db 0x29
+VolumeID	dd 0x1baddad0
+VolumeLabel db "AC Boot    "
+FSType      db "SimpleFS"
 
 _start:
 	cli
@@ -189,19 +206,18 @@ reboot:
 
 ; data
 loading db "Loading system",24h
-done db 0ah,0dh,"Done loading!",0ah,0dh,24h
-reboot_msg db "Press any key to try again...",0ah,0dh,24h
+done db 0ah,0dh,"Done!",0ah,0dh,24h
+reboot_msg db "Press any key to retry...",0ah,0dh,24h
 error db "Disk read error.",0ah,0dh,24h
-crlf db 0ah,0dh,24h
 drive db 0
 kernel db "IO      SYS"
 root dw 0x0200
-absTrack dw 0
-absSector dw 0
-absHead dw 0
+absTrack db 0
+absSector db 0
+absHead db 0
 progress db 2eh,24h
-fail db 0ah,0dh,"Disk read error :(",0ah,0dh,24h
-not_supported db "You need atleast a 80386 processor.",0ah,0dh,24h
+fail db 0ah,0dh,"Disk read error.",0ah,0dh,24h
+not_supported db "Not a 80386 or newer processor.",0ah,0dh,24h
 
 times 510-($-$$) db 0
 dw 0xaa55
