@@ -3,7 +3,7 @@ CFLAGS=-std=gnu89 -Wall -Wno-unused-parameter
 LDFLAGS=
 KERNEL=no
 ifeq ($(KERNEL),yes)
-CFLAGS+=-march=i686 -o -oS -ffreestanding -I. -m16
+CFLAGS+=-march=i686 -oS -ffreestanding -I. -m16
 CFLAGS+=-fno-asynchronous-unwind-tables -fno-pic -fno-pie -fno-builtin
 CFLAGS+=-fomit-frame-pointer -ffunction-sections -fdata-sections -fno-ident
 CFLAGS+=-fno-stack-protector
