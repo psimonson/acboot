@@ -73,7 +73,7 @@ int cmd_help(const drive_params_t *UNUSED(p))
  */
 int cmd_list(const drive_params_t *p)
 {
-	list_files();
+	list_files(load_table(p));
 	return 0;
 }
 /* Search for a file in the root of the drive.
@@ -83,7 +83,7 @@ int cmd_find(const drive_params_t *p)
 	char buf[32];
 	printf("Enter file name: ");
 	gets(buf, sizeof(buf));
-	if(search_file(buf) != NULL)
+	if(search_file(load_table(p), buf) != NULL)
 		printf("File %s found.\r\n", buf);
 	else
 		printf("File %s not found.\r\n", buf);
@@ -101,7 +101,7 @@ int cmd_exec(const drive_params_t *p)
 	if(memcmp(buf, "IO.SYS", 6) == 0 || memcmp(buf, "SHELL.APP", 9) == 0)
 		printf("Cannot execute, %s is a system file.\r\n", buf);
 	else {
-		if((entry = search_file(buf)) != NULL)
+		if((entry = search_file(load_table(p), buf)) != NULL)
 			exec_file(p, entry);
 		else
 			printf("App not found.\r\n");
