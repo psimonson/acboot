@@ -10,9 +10,10 @@ CFLAGS+=-fno-stack-protector
 LDFLAGS=-static -s -Os -m elf_i386 -no-pie -nostartfiles --nmagic
 DEBUG?=no
 ifeq ($(DEBUG),yes)
-DEBUG=--strip-debug
+CFLAGS+=-g
+DEBUG_INFO=--strip-debug
 else
-DEBUG=
+DEBUG_INFO=
 endif
 endif
 
@@ -21,7 +22,10 @@ ifeq ($(KERNEL),yes)
 all: boot.bin IO.SYS SHELL.APP GRAPH.APP HELLO.APP
 else
 all:
-	$(MAKE) KERNEL=yes $(DEBUG)
+	$(MAKE) KERNEL=yes DEBUG=no
+	$(MAKE) ft
+all-debug:
+	$(MAKE) KERNEL=yes DEBUG=yes
 	$(MAKE) ft
 endif
 

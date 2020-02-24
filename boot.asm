@@ -4,7 +4,7 @@
 ; by Philip R. Simonson
 ; ===============================================================
 [bits 16]
-[org 0x0]
+[org 0x7c00]
 
 jmp short _start
 nop
@@ -25,13 +25,13 @@ dd 0 ; padding
 Drive db 0
 DirtyBit db 1
 extBootSig db 0x29
-VolumeID	dd 0x1baddad0
+VolumeID	dd 0x01baddad
 VolumeLabel db "AC Boot    "
 FSType      db "SimpleFS"
 
 _start:
 	cli
-	mov ax, 0x07c0
+	mov ax, cs
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
@@ -81,7 +81,7 @@ _start:
 	cmp dx, 1
 	je .error
 	mov dl, byte [drive]
-	jmp 0x0050:0x0000
+	jmp 0x0100:0x0000
 
 .error:
 	call reboot
@@ -120,7 +120,7 @@ load_kernel:
 .match:
 	mov ax, word [bx+14]
 	mov cx, word [bx+12]
-	mov bx, 0x0050
+	mov bx, 0x0100
 	mov es, bx
 	xor bx, bx
 	call read_sectors
