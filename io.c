@@ -23,10 +23,15 @@ void main(void)
 	drive_params_t p;
 
 	asm volatile(
+		"cli\n"
 		"movw %%cs, %%ax\n"
 		"movw %%ax, %%ds\n"
 		"movw %%ax, %%es\n"
+		"movw %%ax, %%fs\n"
+		"movw %%ax, %%gs\n"
 		"movw %%ax, %%ss\n"
+		"movw $0xfffe, %%sp\n"
+		"sti\n"
 		"movb %%dl, %0\n"
 		: "=r"(drive)
 	);
