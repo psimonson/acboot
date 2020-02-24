@@ -33,7 +33,7 @@ void main(void)
 			unsigned char *table = load_table(&p);
 			dump_table(table);
 /*			const char *filename = get_filename_user("SHELL.APP");
-			if((entry = search_file(filename)) != NULL)
+			if((entry = search_file(table, filename)) != NULL)
 				exec_file(&p, entry);
 			else
 				printf("File: %s Not found.\r\n", filename);

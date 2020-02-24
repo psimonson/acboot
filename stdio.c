@@ -17,7 +17,7 @@ asm(".code16gcc");
 __REGPARM void setup(void)
 {
 	asm volatile(
-		"xorw %ax, %ax\n"
+		"movw %cs, %ax\n"
 		"movw %ax, %ds\n"
 		"movw %ax, %es\n"
 		"movw %ax, %fs\n"
