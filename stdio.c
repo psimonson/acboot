@@ -12,17 +12,17 @@ asm(".code16gcc");
 #include <stdarg.h>
 #include "stdio.h"
 
-/* Setup segment registers for my simple operating system.
+/* Setup segment registers.
  */
 __REGPARM void setup(unsigned short offset)
 {
 	asm volatile(
-		"mov %%ax, %%ds\n"
-		"mov %%ax, %%es\n"
-		"mov %%ax, %%fs\n"
-		"mov %%ax, %%gs\n"
-		:
-		: "a"(offset)
+		"movw %%ax, %%ds\n"
+		"movw %%ax, %%es\n"
+		"movw %%ax, %%fs\n"
+		"movw %%ax, %%gs\n"
+        :
+        : "a"(offset)
 	);
 }
 /* Get cursor position on screen.
@@ -175,6 +175,20 @@ void reverse(char *s)
 		*t = c;
 	}
 }
+/* Convert hexidecimal number to string.
+ */
+void itoh(int n, char *s, int size)
+{
+	const char *digits = "0123456789ABCDEF";
+	char *p = s;
+
+	if(n < 0)
+		n = -n;
+	do {
+		*p++ = digits[n%16];
+	} while((n /= 16) > 0);
+	*p = '\0';
+}
 /* Convert decimal number to string.
  */
 void itoa(int n, char *s, int size)
@@ -230,8 +244,8 @@ int printf(const char *fmt, ...)
 			print(&c, sizeof(c));
 			written++;
 		} else if(*fmt == 'd') {
-			char buf[32]; /* very large size */
-			int len; /* length of string in buf */
+			char buf[32];	/* buffer to hold string */
+			int len;		/* length of buf */
 			int n = va_arg(ap, int);
 			fmt++;
 			itoa(n, buf, sizeof(buf));
@@ -243,6 +257,15 @@ int printf(const char *fmt, ...)
 			int len = strlen(str);
 			fmt++;
 			print(str, len);
+			written += len;
+		} else if(*fmt == 'x') {
+			char buf[32];	/* buffer to hold string */
+			int len;		/* length of buf */
+			int n = va_arg(ap, int);
+			fmt++;
+			itoh(n, buf, sizeof(buf));
+			len = strlen(buf);
+			print(buf, len);
 			written += len;
 		} else {
 			int len = strlen(fmt);

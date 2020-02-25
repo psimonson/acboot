@@ -97,8 +97,8 @@ load_kernel:
 	rep cmpsb
 	jne .no_match
 .match:
-	mov ax, word [bx+13]
-	mov cx, word [bx+11]
+	mov ax, word [bx+14]
+	mov cx, word [bx+12]
 	mov bx, 0x0050
 	mov es, bx
 	xor bx, bx

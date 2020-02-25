@@ -13,18 +13,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "prsfs.h"
+#include "file.h"
 
-/* number of files to write */
-#define FILE_COUNT	3
-/* some defines for io sys */
-#define IO_START	2		/* starting sector of operating system */
-#define IO_SECTORS	14		/* total operating system sectors */
-/* some defines for binary app */
-#define SHELL_START (IO_START+IO_SECTORS)+1
-#define SHELL_SECTORS 17
-/* some defines for graph app */
-#define GRAPH_START (SHELL_START+SHELL_SECTORS)+1
-#define GRAPH_SECTORS 11
 /* Program to create a simple file system.
  */
 int main(void)
@@ -36,6 +26,7 @@ int main(void)
 	init_entry(&ftable[0], "IO      SYS", IO_SECTORS, IO_START);
 	init_entry(&ftable[1], "SHELL   APP", SHELL_SECTORS, SHELL_START);
 	init_entry(&ftable[2], "GRAPH   APP", GRAPH_SECTORS, GRAPH_START);
+/*	init_entry(&ftable[3], "HELLO   APP", HELLO_SECTORS, HELLO_START);*/
 	errno = 0;
 	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));
