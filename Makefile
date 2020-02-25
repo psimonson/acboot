@@ -4,12 +4,12 @@ LDFLAGS=
 KERNEL=no
 ifeq ($(KERNEL),yes)
 CFLAGS+=-m32 -fno-builtin -nostdlib -ffreestanding -fno-stack-protector
-LDFLAGS=-m elf_i386
+LDFLAGS=-m elf_i386 -no-startfiles --nmagic
 DEBUG?=no
 ifeq ($(DEBUG),yes)
-DEBUG=--strip-debug
+DEBUG_INFO=--strip-debug
 else
-DEBUG=
+DEBUG_INFO=
 endif
 endif
 
@@ -17,7 +17,7 @@ endif
 ifeq ($(KERNEL),yes)
 all: boot.bin IO.SYS SHELL.APP GRAPH.APP
 else
-all: ft
+all: kernel
 endif
 
 %.c.o: %.c
@@ -48,21 +48,21 @@ ft: ft.c.o prsfs.c.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 kernel:
-	$(MAKE) KERNEL=yes
-	$(MAKE)
+	$(MAKE) KERNEL=yes DEBUG=no
+	$(MAKE) ft
 
 kernel-debug:
 	$(MAKE) KERNEL=yes DEBUG=yes
-	$(MAKE)
+	$(MAKE) ft
 
 disk-clean:
 	rm -f floppy.img
 
-disk-debug: disk-clean kernel-debug
+disk-debug: clean kernel-debug
 	dd if=/dev/zero of=floppy.img bs=512 count=2880
 	./ft
 
-disk: disk-clean kernel
+disk: clean kernel
 	dd if=/dev/zero of=floppy.img bs=512 count=2880
 	./ft
 

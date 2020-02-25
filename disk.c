@@ -19,13 +19,12 @@ __REGPARM int get_drive_params(const unsigned char drive, drive_params_t *p)
 	unsigned short tmp1, tmp2;
 
 	asm volatile(
-		"push %%bx\n"
+		"push %%ds\n"
 		"push %%es\n"
-		"mov $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
 		"pop %%es\n"
-		"pop %%bx\n"
+		"pop %%ds\n"
 		: "=r"(failed), "=c"(tmp1), "=d"(tmp2)
 		: "a"(0x0800), "d"(0x0000 | drive), "D"(0)
 		: "cc", "bx"
@@ -67,17 +66,11 @@ __REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 	h = (lba / p->spt) % p->numh;
 
 	asm volatile(
-		"push %%bx\n"
-		"push %%es\n"
-		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		"pop %%es\n"
-		"pop %%bx\n"
 		: "=r"(failed), "=a"(status)
 		: "a"(0x0200 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)
-		: "cc"
 	);
 
 	if(failed)
@@ -99,17 +92,11 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 	h = (lba / p->spt) % p->numh;
 
 	asm volatile(
-		"push %%bx\n"
-		"push %%es\n"
-		"movb $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		"pop %%es\n"
-		"pop %%bx\n"
 		: "=r"(failed), "=a"(status)
 		: "a"(0x0300 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)
-		: "cc"
 	);
 
 	if(failed)
