@@ -7,7 +7,7 @@
  */
 
 asm(".code16gcc");
-asm("jmp main");
+asm("jmpl $0, $main");
 
 #include "stdio.h"
 #include "disk.h"
@@ -15,6 +15,8 @@ asm("jmp main");
 #include "unused.h"
 #include "fs.h"
 
+/* Boot sector entry */
+#define SHELL_ENTRY 0x7e00
 /* Conversion macros */
 #define CONV_STR(x) #x
 #define STR(x) CONV_STR(x)
@@ -157,6 +159,7 @@ void loop(const drive_params_t *p)
  */
 void main(void)
 {
+	const void *e = (const void *)SHELL_ENTRY;
 	unsigned char drive = -1;
 	drive_params_t p;
 
@@ -169,5 +172,6 @@ void main(void)
 		loop(&p);
 	}
 	printf("Halting system...\r\n");
-	asm volatile("hlt");
+	asm volatile("movb %0, %%dl" : : "m"(p.drive));
+	goto *e;
 }

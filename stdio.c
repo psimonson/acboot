@@ -14,15 +14,15 @@ asm(".code16gcc");
 
 /* Setup segment registers.
  */
-__REGPARM void setup(void)
+__REGPARM void setup(unsigned short offset)
 {
 	asm volatile(
-		"movw %cs, %ax\n"
-		"movw %ax, %ds\n"
-		"movw %ax, %es\n"
-		"movw %ax, %fs\n"
-		"movw %ax, %gs\n"
-		"movw %ax, %ss\n"
+		"movw %%ax, %%ds\n"
+		"movw %%ax, %%es\n"
+		"movw %%ax, %%fs\n"
+		"movw %%ax, %%gs\n"
+        :
+        : "a"(offset)
 	);
 }
 /* Get cursor position on screen.

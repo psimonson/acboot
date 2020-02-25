@@ -3,9 +3,8 @@ CFLAGS=-std=gnu89 -Wall -Wno-unused-parameter
 LDFLAGS=
 KERNEL=no
 ifeq ($(KERNEL),yes)
-CFLAGS+=-march=i386 -ffreestanding -I. -m16 -fno-builtin
-CFLAGS+=-fomit-frame-pointer -fno-stack-protector
-LDFLAGS=-s -Os -m elf_i386 -nostartfiles --nmagic
+CFLAGS+=-m32 -fno-builtin -nostdlib -ffreestanding -fno-stack-protector
+LDFLAGS=-m elf_i386 -no-startfiles --nmagic
 DEBUG?=no
 ifeq ($(DEBUG),yes)
 CFLAGS+=-g
@@ -19,12 +18,7 @@ endif
 ifeq ($(KERNEL),yes)
 all: boot.bin IO.SYS SHELL.APP GRAPH.APP HELLO.APP
 else
-all:
-	$(MAKE) KERNEL=yes DEBUG=no
-	$(MAKE) ft
-all-debug:
-	$(MAKE) KERNEL=yes DEBUG=yes
-	$(MAKE) ft
+all: kernel
 endif
 
 %.c.o: %.c
@@ -60,14 +54,22 @@ boot.bin: boot.asm
 ft: ft.c.o prsfs.c.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
+kernel:
+	$(MAKE) KERNEL=yes DEBUG=no
+	$(MAKE) ft
+
+kernel-debug:
+	$(MAKE) KERNEL=yes DEBUG=yes
+	$(MAKE) ft
+
 disk-clean:
 	rm -f floppy.img
 
-disk-debug: disk-clean all-debug
+disk-debug: clean kernel-debug
 	dd if=/dev/zero of=floppy.img bs=512 count=2880
 	./ft
 
-disk: disk-clean all
+disk: clean kernel
 	dd if=/dev/zero of=floppy.img bs=512 count=2880
 	./ft
 

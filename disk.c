@@ -19,10 +19,13 @@ __REGPARM int get_drive_params(const unsigned char drive, drive_params_t *p)
 	unsigned short tmp1, tmp2;
 
 	asm volatile(
-		"movw $0, %0\n"
+		"push %%ds\n"
+		"push %%es\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		: "=m"(failed), "=c"(tmp1), "=d"(tmp2)
+		"pop %%es\n"
+		"pop %%ds\n"
+		: "=r"(failed), "=c"(tmp1), "=d"(tmp2)
 		: "a"(0x0800), "d"(0x0000 | drive), "D"(0)
 		: "cc", "bx"
 	);
@@ -62,10 +65,9 @@ __REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 	lba_chs(p, lba, &c, &h, &s);
 
 	asm volatile(
-		"movw $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		: "=m"(failed), "=a"(status)
+		: "=r"(failed), "=a"(status)
 		: "a"(0x0200 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)
 	);
@@ -87,10 +89,9 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 	lba_chs(p, lba, &c, &h, &s);
 
 	asm volatile(
-		"movw $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		: "=m"(failed), "=a"(status)
+		: "=r"(failed), "=a"(status)
 		: "a"(0x0300 | blocks), "b"(buffer), "c"((c << 8) | s),
 			"d"((h << 8) | p->drive)
 	);
@@ -104,7 +105,7 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 void *load_table(const drive_params_t *p)
 {
 	static unsigned char sector[BLOCK_SIZE];
-	static unsigned char loaded = 0;
+	static char loaded = 0;
 
 	if(loaded == 0) {
 		reset_disk(p);
@@ -112,6 +113,7 @@ void *load_table(const drive_params_t *p)
 			loaded = 1;
 			return sector;
 		} else {
+			loaded = 0;
 			return NULL;
 		}
 	}
@@ -119,28 +121,20 @@ void *load_table(const drive_params_t *p)
 }
 /* Dump table to standard output.
  */
-void dump_table(const unsigned char table[])
+__REGPARM void dump_table(const unsigned char *table)
 {
 	int i, j;
 	for(i = 0, j = 0; i < BLOCK_SIZE; i++) {
-		if((i % 30) == 0) {
+		if((i % 26) == 0) {
 			j++;
 			printf("\r\n");
 		} else {
 			printf("%x ", table[i]);
 		}
-		if((j % 20) == 0) getc();
+		if(j > 0 && (j % 20) == 0) {
+			printf("Press a key to continue...\r\n");
+			(void)getc();
+		}
 	}
 	printf("\r\n");
-}
-/* Convert Logical block addressing to CHS.
- */
-void lba_chs(const drive_params_t *p, unsigned int lba,
-	unsigned char *c, unsigned char *h, unsigned char *s)
-{
-	unsigned int temp = lba / p->spt;
-	*c = temp / p->numh;
-	*h = temp % p->numh;
-	*s = (lba % p->spt) + 1;
-	printf("*** [C:%d,H:%d,S:%d] ***\r\n", *c, *h, *s);
 }
