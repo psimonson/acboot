@@ -43,11 +43,12 @@ __REGPARM int reset_disk(const drive_params_t *p)
 {
 	unsigned char failed = 0;
 	asm volatile(
+		"movw $0, %0\n"
 		"int $0x13\n"
 		"setcb %0\n"
-		: "=r"(failed)
+		: "=m"(failed)
 		: "a"(0x0000), "d"(0x0000 | p->drive)
-		: "cc"
+		: "cc", "bx"
 	);
 	return !failed;
 }
@@ -61,9 +62,7 @@ __REGPARM int read_disk(const void *buffer, const drive_params_t *p,
 	unsigned char c, h, s;
 
 	/* LBA to CHS value */
-	s = (lba % p->spt) + 1;
-	c = (lba / p->spt) / p->numh;
-	h = (lba / p->spt) % p->numh;
+	lba_chs(p, lba, &c, &h, &s);
 
 	asm volatile(
 		"int $0x13\n"
@@ -86,10 +85,8 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 	unsigned char failed = 0;
 	unsigned char c, h, s;
 
-	/* convert lba to chs */
-	s = (lba % p->spt) + 1;
-	c = (lba / p->spt) / p->numh;
-	h = (lba / p->spt) % p->numh;
+	/* LBA to CHS value */
+	lba_chs(p, lba, &c, &h, &s);
 
 	asm volatile(
 		"int $0x13\n"
@@ -103,9 +100,9 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 		return 0;
 	return (status & 0x00ff);
 }
-/* Get my file system table from disk.
+/* Load my file system table from disk.
  */
-__REGPARM void *get_ftable(const drive_params_t *p)
+void *load_table(const drive_params_t *p)
 {
 	static unsigned char sector[BLOCK_SIZE];
 	static char loaded = 0;

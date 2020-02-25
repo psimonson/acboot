@@ -6,13 +6,13 @@
  ********************************************************************
  */
 
-asm(".code16gcc\n");
+asm(".code16gcc");
 
 #include "stdio.h"
 #include "disk.h"
 #include "fs.h"
 
-#define IMAGE_ENTRY 0x7e00
+#define SHELL_ENTRY 0x1000
 
 /* Get file name from entry.
  */
@@ -36,34 +36,34 @@ char *get_filename(const struct file *entry)
  */
 char *get_filename_user(const char *filename)
 {
-	static char converted[12];
-	int i, j;
+	static char converted[13];
+	int i, j, len = strlen(filename);
 
-	memset(converted, 0, 11);
+	memset(converted, 0, 13);
 	for(i = 0, j = 0;
-		j < 8 && filename[j] != '.';
-		i++, j++)
+		j < 8 && filename[j] != '.'; i++,j++)
 		converted[i] = filename[j];
 	while(i < 8 && filename[j] == '.')
 		converted[i++] = ' ';
 	++j;
-	for( ; j < 11 && filename[j] != ' '; j++, i++)
+	for(; i <= 11 || (j <= len && filename[j] != ' '); i++,j++)
 		converted[i] = filename[j];
 	converted[i] = '\0';
 	return converted;
 }
 /* Search for file in file system and return if found.
  */
-struct file *search_file(const unsigned char *ftable, const char *filename)
+struct file *search_file(const unsigned char table[], const char *filename)
 {
 	struct file *entry;
 	int i;
 
 	for(i = 0; i < MAXFILES; i++) {
-		const char *fname = get_filename_user(filename);
-		entry = (struct file *)&ftable[i*16];
-		if(memcmp(fname, entry->filename, 11) == 0)
-			return entry;
+		entry = (struct file *)&table[i*16];
+		if(entry->filename[0] != 0xf7 || entry->filename[0] != 0x00) {
+			if(memcmp(filename, entry->filename, 11) == 0)
+				return entry;
+		}
 	}
 	return NULL;
 }
@@ -71,16 +71,16 @@ struct file *search_file(const unsigned char *ftable, const char *filename)
  */
 void exec_file(const drive_params_t *p, const struct file *entry)
 {
-	void *buffer = (void*)IMAGE_ENTRY;
+	void *e = (void*)SHELL_ENTRY;
 	unsigned short start_sector = entry->start;
 	unsigned short num_sectors = entry->num_sectors;
 	int num_read = 0;
 
 	reset_disk(p);
-	if((num_read = read_disk(buffer, p, start_sector, num_sectors))
+	if((num_read = read_disk(e, p, start_sector, num_sectors))
 			== num_sectors) {
-		asm volatile("" : : "d"(p->drive));
-		goto *buffer;
+		asm volatile("movb %0, %%dl\n" : : "r"(p->drive));
+		goto *e;
 	}
 
 	printf("Binary could not be loaded.\r\n"
@@ -88,21 +88,16 @@ void exec_file(const drive_params_t *p, const struct file *entry)
 }
 /* List root directory (all files).
  */
-void list_files(const drive_params_t *p)
+void list_files(const unsigned char *table)
 {
-	unsigned char *table = get_ftable(p);
-	if(table != NULL) {
-		int i, count = 0;
+	int i, count = 0;
 
-		for(i = 0; i < MAXFILES; i++) {
-			struct file *entry = (struct file *)&table[i*16];
-			if(entry->filename[0] == 0xf7) continue;
-			printf("%s [Sectors occuped: %d, Starting sector: %d]\r\n",
-				get_filename(entry), entry->num_sectors, entry->start);
-			count++;
-		}
-		printf("Total files in root: %d\r\n", count);
-		return;
+	for(i = 0; i < MAXFILES; i++) {
+		struct file *entry = (struct file *)&table[i*16];
+		if(entry->filename[0] == 0xf7 || entry->filename[0] == 0x00) continue;
+		printf("%s [Sectors occuped: %d, Starting sector: %d]\r\n",
+			get_filename(entry), entry->num_sectors, entry->start);
+		count++;
 	}
-	printf("No files on the current disk.\r\n");
+	printf("Total files in root: %d\r\n", count);
 }
