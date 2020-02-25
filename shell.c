@@ -6,8 +6,8 @@
  *********************************************************************
  */
 
-asm(".code16gcc\n");
-asm("jmpl $0, $main\n");
+asm(".code16gcc");
+asm("jmpl $0, $main");
 
 #include "stdio.h"
 #include "disk.h"

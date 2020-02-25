@@ -33,5 +33,7 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 	unsigned int lba, unsigned char blocks);
 /* read my file system table from disk */
 __REGPARM void *get_ftable(const drive_params_t *p);
+/* display table contents in hexadecimal */
+__REGPARM void dump_table(const unsigned char *table);
 
 #endif

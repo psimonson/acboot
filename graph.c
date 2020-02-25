@@ -16,13 +16,13 @@ asm("jmpl $0, $main");
 #define MAX_COLS	320
 #define MAX_ROWS	200
 
-#define BOOT_ENTRY 0x0050
+#define SHELL_ENTRY 0x7e00
 
 /* Program to display rectangles on screen.
  */
 void main(void)
 {
-	const void *e = (const void *)BOOT_ENTRY;
+	const void *e = (const void *)SHELL_ENTRY;
 	unsigned char drive = -1;
 	drive_params_t p;
 	unsigned short i = 0, j = 0, m = 0;
@@ -32,7 +32,6 @@ void main(void)
 	asm volatile("" : "=d"(drive));
 	setup(0x0000);
 	get_drive_params(drive, &p);
-
 	clrscr(0x03);
 	printf("This is a graphics demonstration it waits until a\r\n"
 		"key is pressed otherwise continues to draw rectangles.\r\n"

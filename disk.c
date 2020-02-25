@@ -8,6 +8,7 @@
 
 asm(".code16gcc");
 
+#include "stdio.h"
 #include "disk.h"
 
 /* Get drive parameters from BIOS.
@@ -133,4 +134,23 @@ __REGPARM void *get_ftable(const drive_params_t *p)
 		}
 	}
 	return sector;
+}
+/* Dump table to standard output.
+ */
+__REGPARM void dump_table(const unsigned char *table)
+{
+	int i, j;
+	for(i = 0, j = 0; i < BLOCK_SIZE; i++) {
+		if((i % 26) == 0) {
+			j++;
+			printf("\r\n");
+		} else {
+			printf("%x ", table[i]);
+		}
+		if(j > 0 && (j % 20) == 0) {
+			printf("Press a key to continue...\r\n");
+			(void)getc();
+		}
+	}
+	printf("\r\n");
 }
