@@ -26,7 +26,7 @@ int main(void)
 	init_entry(&ftable[0], "IO      SYS", IO_SECTORS, IO_START);
 	init_entry(&ftable[1], "SHELL   APP", SHELL_SECTORS, SHELL_START);
 	init_entry(&ftable[2], "GRAPH   APP", GRAPH_SECTORS, GRAPH_START);
-	init_entry(&ftable[3], "HELLO   APP", HELLO_SECTORS, HELLO_START);
+/*	init_entry(&ftable[3], "HELLO   APP", HELLO_SECTORS, HELLO_START);*/
 	errno = 0;
 	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));

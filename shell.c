@@ -75,17 +75,18 @@ int cmd_help(const drive_params_t *UNUSED(p))
  */
 int cmd_list(const drive_params_t *p)
 {
-	list_files(load_table(p));
+	list_files(p);
 	return 0;
 }
 /* Search for a file in the root of the drive.
  */
 int cmd_find(const drive_params_t *p)
 {
+	const unsigned char *table = get_ftable(p);
 	char buf[32];
 	printf("Enter file name: ");
 	gets(buf, sizeof(buf));
-	if(search_file(load_table(p), buf) != NULL)
+	if(search_file(table, buf) != NULL)
 		printf("File %s found.\r\n", buf);
 	else
 		printf("File %s not found.\r\n", buf);
@@ -95,18 +96,21 @@ int cmd_find(const drive_params_t *p)
  */
 int cmd_exec(const drive_params_t *p)
 {
+	unsigned char *table;
 	struct file *entry;
 	char buf[32];
-
 	printf("Enter program name: ");
 	gets(buf, sizeof(buf));
-	if(memcmp(buf, "IO.SYS", 6) == 0 || memcmp(buf, "SHELL.APP", 9) == 0)
+	if(memcmp(buf, "IO.SYS", 6) == 0 || memcmp(buf, "SHELL.APP", 6) == 0)
 		printf("Cannot execute, %s is a system file.\r\n", buf);
 	else {
-		if((entry = search_file(load_table(p), buf)) != NULL)
-			exec_file(p, entry);
-		else
-			printf("App not found.\r\n");
+		if((table = get_ftable(p)) != NULL) {
+			if((entry = search_file(table, buf)) != NULL) {
+					exec_file(p, entry);
+			} else {
+				printf("App not found.\r\n");
+			}
+		}
 	}
 	return 0;
 }
@@ -162,16 +166,10 @@ void main(void)
 	const void *e = (const void *)SHELL_ENTRY;
 	unsigned char drive = -1;
 	drive_params_t p;
-
-	setup();
-	asm volatile("movb %%dl, %0\n" : "=r"(drive));
-
-	if(drive >= 0 && drive <= 0xff) {
-		get_drive_params(drive, &p);
-		(void)load_table(&p);
-		loop(&p);
-	}
-	printf("Halting system...\r\n");
-	asm volatile("movb %0, %%dl" : : "m"(p.drive));
+	asm volatile("" : "=d"(drive));
+	setup(0x0000);
+	get_drive_params(drive, &p);
+	loop(&p);
+	asm volatile("" : : "d"(p.drive));
 	goto *e;
 }

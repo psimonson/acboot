@@ -7,7 +7,7 @@
  */
 
 asm(".code16gcc");
-asm("jmp main");
+asm("jmpl $0, $main");
 
 #include "stdio.h"
 #include "types.h"
@@ -19,31 +19,22 @@ asm("jmp main");
 void main(void)
 {
 	unsigned char drive = -1;
-	struct file *entry = NULL;
+	unsigned char *table;
+	struct file *entry;
 	drive_params_t p;
 
-	setup();
-	asm volatile("movb %%dl, %0\n" : "=r"(drive));
-
-	if(drive >= 0 && drive <= 0xff) {
-		get_drive_params(drive, &p);
-		printf("BIOS drive: %d\r\n", p.drive);
-
-		{
-			unsigned char *table = load_table(&p);
-			dump_table(table);
-/*			const char *filename = get_filename_user("SHELL.APP");
-			if((entry = search_file(table, filename)) != NULL)
-				exec_file(&p, entry);
-			else
-				printf("File: %s Not found.\r\n", filename);
-*/		}
+	asm volatile("" : "=d"(drive));
+	setup(0x0000);
+	get_drive_params(drive, &p);
+	printf("BIOS drive: %d\r\n", p.drive);
+	if((table = get_ftable(&p)) != NULL) {
+		if((entry = search_file(table, "SHELL.APP")) != NULL)
+			exec_file(&p, entry);
+		else
+			printf("File: %s Not found.\r\n");
 	}
-
 	type("Press any key to reboot...\r\n");
 	asm volatile(
-		"xorw %ax, %ax\n"
-		"int $0x16\n"
-		"jmpl $0xffff, $0x0000"
+		"jmpl $0x0000, $0xffff"
 	);
 }
