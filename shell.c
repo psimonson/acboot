@@ -16,7 +16,7 @@ asm("jmpl $0, $main\n");
 #include "fs.h"
 
 /* Boot sector entry */
-#define BOOT_ENTRY 0x1000
+#define BOOT_ENTRY 0x7e00
 /* Conversion macros */
 #define CONV_STR(x) #x
 #define STR(x) CONV_STR(x)

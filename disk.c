@@ -120,9 +120,17 @@ __REGPARM int write_disk(const void *buffer, const drive_params_t *p,
 __REGPARM void *get_ftable(const drive_params_t *p)
 {
 	static unsigned char sector[BLOCK_SIZE];
-	reset_disk(p);
-	if(read_disk(sector, p, 1, 1) == 1)
-		return sector;
-	reset_disk(p);
-	return NULL;
+	static char loaded = 0;
+
+	if(loaded == 0) {
+		reset_disk(p);
+		if(read_disk(sector, p, 1, 1) == 1) {
+			loaded = 1;
+			return sector;
+		} else {
+			loaded = 0;
+			return NULL;
+		}
+	}
+	return sector;
 }
