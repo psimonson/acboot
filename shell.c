@@ -166,8 +166,8 @@ void main(void)
 	const void *e = (const void *)SHELL_ENTRY;
 	unsigned char drive = -1;
 	drive_params_t p;
+	setup();
 	asm volatile("" : "=d"(drive));
-	setup(0x0000);
 	get_drive_params(drive, &p);
 	loop(&p);
 	asm volatile("" : : "d"(p.drive));

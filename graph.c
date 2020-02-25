@@ -29,8 +29,8 @@ void main(void)
 	unsigned short cnt1 = 0, cnt2 = 0;
 	unsigned color = 10;
 
+	setup();
 	asm volatile("" : "=d"(drive));
-	setup(0x0000);
 	get_drive_params(drive, &p);
 	clrscr(0x03);
 	printf("This is a graphics demonstration it waits until a\r\n"
