@@ -23,17 +23,17 @@ int main(void)
 	int fout;
 
 	init_table(ftable);
-	init_entry(&ftable[0], "IO      SYS", IO_SECTORS, IO_START);
-	init_entry(&ftable[1], "SHELL   APP", SHELL_SECTORS, SHELL_START);
-	init_entry(&ftable[2], "GRAPH   APP", GRAPH_SECTORS, GRAPH_START);
-/*	init_entry(&ftable[3], "HELLO   APP", HELLO_SECTORS, HELLO_START);*/
+	init_entry(&ftable[0], "IO      SYS");
+	init_entry(&ftable[1], "SHELL   APP");
+	init_entry(&ftable[2], "GRAPH   APP");
+/*	init_entry(&ftable[3], "HELLO   APP");*/
 	errno = 0;
-	if((fout = open("floppy.img", O_RDWR | O_CREAT)) < 0) {
+	if((fout = open("floppy.img", O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP)) < 0) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));
 		return 1;
 	}
 	write_file(fout, 0, 1, "boot.bin");
-	write_table(fout, ftable);
+	write_table(fout, ftable, IO_START);
 	close(fout);
 	return 0;
 }

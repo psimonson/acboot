@@ -29,13 +29,12 @@ void init_table(struct file *table)
 }
 /* Initialise ftable entry.
  */
-void init_entry(struct file *entry, const char *filename,
-	unsigned short num_sectors, unsigned short start)
+void init_entry(struct file *entry, const char *filename)
 {
 	if(entry == NULL) return;
 	memcpy(entry->filename, filename, 11);
-	entry->num_sectors = num_sectors;
-	entry->start = start;
+	entry->num_sectors = 0;
+	entry->start = 1;
 	entry->_reserved = 0;
 	_prsfs_file_count++;
 }
@@ -68,7 +67,7 @@ int write_file(int fout, unsigned char sector_skip,
 	lseek(fout, sector_skip*512, SEEK_SET);
 	while(total_sectors < sector_count
 			&& (nbytes = read(fin, buf, sizeof(buf))) > 0) {
-		if((nbytes = write(fout, buf, nbytes)) >= 0) {
+		if((nbytes = write(fout, buf, nbytes)) > 0) {
 			total_bytes += nbytes;
 			total_sectors++;
 		}
@@ -97,26 +96,44 @@ char *get_filename(struct file *entry)
 }
 /* Write file table to disk.
  */
-int write_table(int fout, struct file *table)
+int write_table(int fout, struct file *table, unsigned short start)
 {
 	int total_bytes = 0;
 
-	errno = 0;
-	total_bytes = write(fout, table, sizeof(struct file)*MAXFILES);
-	if(errno != 0) {
-		fprintf(stderr, "Error: %s\n", strerror(errno));
-		return 1;
-	}
-	printf("Table written totaling %d bytes.\n", total_bytes);
-	printf("Size of table struct is %lu.\n", sizeof(struct file));
 	if(_prsfs_file_count > 0) {
 		int i;
 
 		for(i = 0; i < _prsfs_file_count; i++) {
 			const char *filename = get_filename(&table[i]);
+			struct stat st;
+			int fd;
+
+			if((fd = open(filename, O_RDONLY, S_IRUSR | S_IRGRP)) < 0) continue;
+			if(fstat(fd, &st) < 0) {
+				fprintf(stderr, "Warning: Could not stat() file: %s\n",
+					filename);
+				close(fd);
+				continue;
+			}
+			close(fd);
+			table[i].start = start;
+			table[i].num_sectors = (st.st_size/512)+1;
+			start += (st.st_size/512)+1;
+		}
+		errno = 0;
+		total_bytes = write(fout, table, sizeof(struct file)*MAXFILES);
+		if(errno != 0) {
+			fprintf(stderr, "Error: %s\n", strerror(errno));
+			return 1;
+		}
+		printf("Table written totaling %d bytes.\n", total_bytes);
+		printf("Size of table struct is %lu.\n", sizeof(struct file));
+		for(i = 0; i < _prsfs_file_count; i++) {
+			const char *filename = get_filename(&table[i]);
 			printf("File: %s\n", filename);
-			write_file(fout, table[i].start, table[i].num_sectors,
-				filename);
+			write_file(fout, table[i].start, table[i].num_sectors, filename);
+			printf("Wrote %u sectors starting at %u\n",
+				table[i].num_sectors, table[i].start);
 		}
 	}
 	return 0;
