@@ -100,14 +100,6 @@ int write_table(int fout, struct file *table, unsigned short start)
 {
 	int total_bytes = 0;
 
-	errno = 0;
-	total_bytes = write(fout, table, sizeof(struct file)*MAXFILES);
-	if(errno != 0) {
-		fprintf(stderr, "Error: %s\n", strerror(errno));
-		return 1;
-	}
-	printf("Table written totaling %d bytes.\n", total_bytes);
-	printf("Size of table struct is %lu.\n", sizeof(struct file));
 	if(_prsfs_file_count > 0) {
 		int i;
 
@@ -126,10 +118,22 @@ int write_table(int fout, struct file *table, unsigned short start)
 			close(fd);
 			table[i].start = start;
 			table[i].num_sectors = st.st_size/512;
+			start += (st.st_size/512)+1;
+		}
+		errno = 0;
+		total_bytes = write(fout, table, sizeof(struct file)*MAXFILES);
+		if(errno != 0) {
+			fprintf(stderr, "Error: %s\n", strerror(errno));
+			return 1;
+		}
+		printf("Table written totaling %d bytes.\n", total_bytes);
+		printf("Size of table struct is %lu.\n", sizeof(struct file));
+		for(i = 0; i < _prsfs_file_count; i++) {
+			const char *filename = get_filename(&table[i]);
 			printf("File: %s\n", filename);
 			write_file(fout, table[i].start, table[i].num_sectors, filename);
-			printf("Wrote %ld sectors starting at %u\n", st.st_size/512, start);
-			start += (st.st_size/512)+1;
+			printf("Wrote %u sectors starting at %u\n",
+				table[i].num_sectors, table[i].start);
 		}
 	}
 	return 0;
