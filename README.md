@@ -8,7 +8,7 @@ in pure C. You can add the IRQs and stuff yourself.
 
 ### Disclamer
 
-This is provided "AS-IS", without and WARRANTY of any kind. Use at your own risk.
+This is provided "AS-IS", without any WARRANTY of any kind. Use at your own risk.
 I cannot be held accountable for what YOU do with this code or what it does to your
 system. So please do NOT blaim me for your own mistakes. Also, this code will only work
 on 80386 or newer. Do NOT expect it to work on a dinosaur PC/laptop.
@@ -22,19 +22,19 @@ on 80386 or newer. Do NOT expect it to work on a dinosaur PC/laptop.
 
 ### Screen shots (More to come)
 
- - Screen shot (02/11/2020)
+ - ### Screen shot (02/11/2020)
 ![Alt text](screens/screen1_02112020.png?raw=true "What it looks like now (02/11/2020).")
- - Screen shot (02/15/2020)
+ - ### Screen shot (02/15/2020)
 ![Alt text](screens/screen2_02152020.png?raw=true "What it looks like now (02/15/2020).")
- - Screen shot (02/15/2020)
+ - ### Screen shot (02/15/2020)
 ![Alt text](screens/screen3_02152020.png?raw=true "What it looks like now (02/15/2020).")
- - Screen shot (02/15/2020)
+ - ### Screen shot (02/15/2020)
 ![Alt text](screens/screen4_02152020.png?raw=true "What it looks like now (02/15/2020).")
- - Screen shot (02/16/2020)
+ - ### Screen shot (02/16/2020)
 ![Alt text](screens/screen5_02162020.png?raw=true "What it looks like now (02/16/2020).")
- - Screen shot (02/16/2020)
+ - ### Screen shot (02/16/2020)
 ![Alt text](screens/screen6_02162020.png?raw=true "What it looks like now (02/16/2020).")
- - Screen shot (02/26/2020)
+ - ### Screen shot (02/26/2020)
 ![Alt text](screens/screen7_02262020.png?raw=true "What it looks like now (02/26/2020).")
 
 ### Developer
