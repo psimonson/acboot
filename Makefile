@@ -22,6 +22,9 @@ endif
 
 %.c.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
+ifeq ($(DEBUG),no)
+	strip --strip-debug --strip-dwo $@
+endif
 
 io.elf: io.c.o stdio.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -T io.ld -o $@ $^

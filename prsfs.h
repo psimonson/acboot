@@ -13,12 +13,10 @@
 #include "types.h"
 
 void init_table(struct file *table);
-void init_entry(struct file *entry, const char *filename,
-	unsigned short num_sectors, unsigned short start);
+void init_entry(struct file *entry, const char *filename);
 void print_entry(struct file *entry);
 int write_file(int fout, unsigned char sector_skip,
 	unsigned char sector_count, const char *filename);
-int write_table(int fout, struct file *table);
-unsigned char *get_entry(unsigned char drive);
+int write_table(int fout, struct file *table, unsigned short start);
 
 #endif

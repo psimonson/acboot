@@ -29,13 +29,12 @@ void init_table(struct file *table)
 }
 /* Initialise ftable entry.
  */
-void init_entry(struct file *entry, const char *filename,
-	unsigned short num_sectors, unsigned short start)
+void init_entry(struct file *entry, const char *filename)
 {
 	if(entry == NULL) return;
 	memcpy(entry->filename, filename, 11);
-	entry->num_sectors = num_sectors;
-	entry->start = start;
+	entry->num_sectors = 1;
+	entry->start = 2;
 	entry->_reserved = 0;
 	_prsfs_file_count++;
 }
@@ -97,7 +96,7 @@ char *get_filename(struct file *entry)
 }
 /* Write file table to disk.
  */
-int write_table(int fout, struct file *table)
+int write_table(int fout, struct file *table, unsigned short start)
 {
 	int total_bytes = 0;
 
@@ -114,9 +113,24 @@ int write_table(int fout, struct file *table)
 
 		for(i = 0; i < _prsfs_file_count; i++) {
 			const char *filename = get_filename(&table[i]);
+			struct stat st;
+			int fd;
+
+			if((fd = open(filename, O_RDONLY, S_IRUSR | S_IRGRP)) < 0) continue;
+			if(fstat(fd, &st) < 0) {
+				fprintf(stderr, "Warning: Could not stat() file: %s\n",
+					filename);
+				close(fd);
+				continue;
+			}
+			table[i].start = start;
+			table[i].num_sectors = st.st_size/512;
+			close(fd);
 			printf("File: %s\n", filename);
 			write_file(fout, table[i].start, table[i].num_sectors,
 				filename);
+			printf("Wrote %ld sectors starting at %u\n", st.st_size/512, start);
+			start += (st.st_size/512)+1;
 		}
 	}
 	return 0;
