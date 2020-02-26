@@ -117,7 +117,7 @@ int write_table(int fout, struct file *table, unsigned short start)
 			}
 			close(fd);
 			table[i].start = start;
-			table[i].num_sectors = st.st_size/512;
+			table[i].num_sectors = (st.st_size/512)+1;
 			start += (st.st_size/512)+1;
 		}
 		errno = 0;
