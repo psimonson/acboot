@@ -7,9 +7,9 @@ CFLAGS+=-m32 -fno-builtin -nostdlib -ffreestanding -fno-stack-protector
 LDFLAGS=-m elf_i386 -no-startfiles --nmagic
 DEBUG?=no
 ifeq ($(DEBUG),yes)
-DEBUG_INFO=--strip-debug
+STRIP_ARGS=--strip-debug
 else
-DEBUG_INFO=
+STRIP_ARGS=--strip-debug --strip-dwo --strip-unneeded
 endif
 endif
 
@@ -23,26 +23,35 @@ endif
 %.c.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 ifeq ($(DEBUG),no)
-	strip --strip-debug --strip-dwo $@
+	strip $(STRIP_ARGS) $@
 endif
 
 io.elf: io.c.o stdio.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -T io.ld -o $@ $^
+ifeq ($(DEBUG),no)
+	strip $(STRIP_ARGS) $@
+endif
 
 shell.elf: shell.c.o stdio.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -T shell.ld -o $@ $^
+ifeq ($(DEBUG),no)
+	strip $(STRIP_ARGS) $@
+endif
 
 graph.elf: graph.c.o stdio.c.o disk.c.o
 	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
+ifeq ($(DEBUG),no)
+	strip $(STRIP_ARGS) $@
+endif
 
 IO.SYS: io.elf
-	objcopy $(DEBUG_INFO) -O binary $^ $@
+	objcopy -O binary $^ $@
 
 SHELL.APP: shell.elf
-	objcopy $(DEBUG_INFO) -O binary $^ $@
+	objcopy -O binary $^ $@
 
 GRAPH.APP: graph.elf
-	objcopy $(DEBUG_INFO) -O binary $^ $@
+	objcopy -O binary $^ $@
 
 boot.bin: boot.asm
 	nasm -f bin -o $@ $^
