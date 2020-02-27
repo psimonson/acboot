@@ -45,18 +45,13 @@ __REGPARM unsigned char inb(unsigned short port)
 }
 /* Connect to the APM API.
  */
-__REGPARM int connect_apm(void)
+__REGPARM void connect_apm(void)
 {
-	unsigned char failed = 0;
 	asm volatile(
-		"movb $0, %0\n"
-		"int $0x15\n"
-		"setcb %0\n"
-		: "=r"(failed)
+		"int $0x15"
+		:
 		: "a"(0x5301), "b"(0x0000)
-		: "cc"
 	);
-	return !failed;
 }
 /* Set APM version.
  */
@@ -70,18 +65,13 @@ __REGPARM void set_apm_ver(unsigned short ver)
 }
 /* Power off the machine.
  */
-__REGPARM int init_shutdown(void)
+__REGPARM void init_shutdown(void)
 {
-	unsigned char failed = 0;
 	asm volatile(
-		"movb $0, %0\n"
-		"int $0x15\n"
-		"setcb %0\n"
-		: "=r"(failed)
+		"int $0x15"
+		:
 		: "a"(0x5307), "b"(0x0001), "c"(0x0003)
-		: "cc"
 	);
-	return !failed;
 }
 /* Halting the system's CPU.
  */

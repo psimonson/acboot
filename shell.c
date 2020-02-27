@@ -121,15 +121,14 @@ int cmd_exec(const drive_params_t *p)
  */
 int cmd_shutdown(const drive_params_t *UNUSED(p))
 {
-	if(connect_apm()) {
-		/* set APM version to 1.2 */
-		set_apm_ver(0x0102);
-		/* try to power off */
-		if(!init_shutdown()) {
-			printf("Could not poweroff machine.\r\nHalting CPU instead...\r\n");
-			halt_cpu();
-		}
-	}
+	/* connect to APM API */
+	connect_apm();
+	/* set APM version to 1.2 */
+	set_apm_ver(0x0102);
+	/* try to power off */
+	init_shutdown();
+	/* If ACPI fails then, halt CPU */
+	halt_cpu();
 	return 0;
 }
 /* Prints the version information to the screen.
