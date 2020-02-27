@@ -33,8 +33,8 @@ void init_entry(struct file *entry, const char *filename)
 {
 	if(entry == NULL) return;
 	memcpy(entry->filename, filename, 11);
-	entry->num_sectors = 0;
-	entry->start = 1;
+	entry->count = 0;
+	entry->start = 0;
 	entry->_reserved = 0;
 	_prsfs_file_count++;
 }
@@ -117,7 +117,7 @@ int write_table(int fout, struct file *table, unsigned short start)
 			}
 			close(fd);
 			table[i].start = start;
-			table[i].num_sectors = (st.st_size/512)+1;
+			table[i].count = (st.st_size/512)+1;
 			start += (st.st_size/512)+1;
 		}
 		errno = 0;
@@ -131,9 +131,9 @@ int write_table(int fout, struct file *table, unsigned short start)
 		for(i = 0; i < _prsfs_file_count; i++) {
 			const char *filename = get_filename(&table[i]);
 			printf("File: %s\n", filename);
-			write_file(fout, table[i].start, table[i].num_sectors, filename);
+			write_file(fout, table[i].start, table[i].count, filename);
 			printf("Wrote %u sectors starting at %u\n",
-				table[i].num_sectors, table[i].start);
+				table[i].count, table[i].start);
 		}
 	}
 	return 0;

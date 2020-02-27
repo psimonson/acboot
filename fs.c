@@ -12,7 +12,7 @@ asm(".code16gcc\n");
 #include "disk.h"
 #include "fs.h"
 
-#define IMAGE_ENTRY 0x7e00
+#define IMAGE_ENTRY 0x0500
 
 /* Get file name from entry.
  */
@@ -73,7 +73,7 @@ void exec_file(const drive_params_t *p, const struct file *entry)
 {
 	void *buffer = (void*)IMAGE_ENTRY;
 	unsigned short start_sector = entry->start;
-	unsigned short num_sectors = entry->num_sectors;
+	unsigned short num_sectors = entry->count;
 	int num_read = 0;
 
 	reset_disk(p);
@@ -97,8 +97,8 @@ void list_files(const drive_params_t *p)
 		for(i = 0; i < MAXFILES; i++) {
 			struct file *entry = (struct file *)&table[i*16];
 			if(entry->filename[0] == 0xf7) continue;
-			printf("%s [Sectors occuped: %d, Starting sector: %d]\r\n",
-				get_filename(entry), entry->num_sectors, entry->start);
+			printf("%s [Starting sector: %d, Sectors Occupied: %d]\r\n",
+				get_filename(entry), entry->start, entry->count);
 			count++;
 		}
 		printf("Total files in root: %d\r\n", count);

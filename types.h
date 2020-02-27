@@ -16,7 +16,7 @@ struct file {
 	unsigned char filename[8];
 	unsigned char extension[3];
 	unsigned char _reserved;
-	unsigned short num_sectors;
+	unsigned short count;
 	unsigned short start;
 } __attribute((packed));
 

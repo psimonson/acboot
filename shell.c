@@ -10,6 +10,7 @@ asm(".code16gcc");
 asm("jmpl $0, $main");
 
 #include "stdio.h"
+#include "system.h"
 #include "disk.h"
 #include "types.h"
 #include "unused.h"
@@ -42,6 +43,7 @@ int cmd_help(const drive_params_t *p);
 int cmd_list(const drive_params_t *p);
 int cmd_find(const drive_params_t *p);
 int cmd_exec(const drive_params_t *p);
+int cmd_shutdown(const drive_params_t *p);
 int cmd_version(const drive_params_t *p);
 int cmd_exit(const drive_params_t *p);
 
@@ -53,6 +55,7 @@ ADD_CMD_ARRAY("help", "Prints this information text.", cmd_help),
 ADD_CMD_ARRAY("list", "Prints all the files in the drive.", cmd_list),
 ADD_CMD_ARRAY("find", "Search the drive for a file.", cmd_find),
 ADD_CMD_ARRAY("exec", "Execute a program from disk.", cmd_exec),
+ADD_CMD_ARRAY("shutdown", "Power off the machine.", cmd_shutdown),
 ADD_CMD_ARRAY("version", "Prints the version information.", cmd_version),
 ADD_CMD_ARRAY("exit", "Exits back to the end of the OS.", cmd_exit)
 END_CMD_ARRAY
@@ -112,6 +115,20 @@ int cmd_exec(const drive_params_t *p)
 			}
 		}
 	}
+	return 0;
+}
+/* Shutdown the computer (poweroff machine).
+ */
+int cmd_shutdown(const drive_params_t *UNUSED(p))
+{
+	/* connect to APM API */
+	connect_apm();
+	/* set APM version to 1.2 */
+	set_apm_ver(0x0102);
+	/* try to power off */
+	init_shutdown();
+	/* If ACPI fails then, halt CPU */
+	halt_cpu();
 	return 0;
 }
 /* Prints the version information to the screen.

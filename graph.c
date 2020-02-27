@@ -10,6 +10,7 @@ asm(".code16gcc");
 asm("jmpl $0, $main");
 
 #include "stdio.h"
+#include "special.h"
 #include "types.h"
 #include "disk.h"
 
@@ -30,7 +31,7 @@ void main(void)
 	unsigned color = 10;
 
 	setup();
-	asm volatile("" : "=d"(drive));
+	asm volatile("movb %%dl, %0" : "=r"(drive));
 	get_drive_params(drive, &p);
 	clrscr(0x03);
 	printf("This is a graphics demonstration it waits until a\r\n"
@@ -69,6 +70,6 @@ void main(void)
 		if(++color > 255) color = 0;
 	}
 	clrscr(0x03);
-	asm("" : : "d"(p.drive));
+	asm("movb %0, %%dl" : : "r"(p.drive));
 	goto *e;
 }
