@@ -4,12 +4,12 @@ LDFLAGS=
 KERNEL=no
 ifeq ($(KERNEL),yes)
 CFLAGS+=-m32 -fno-builtin -nostdlib -ffreestanding -fno-stack-protector
+CFLAGS+=-fno-toplevel-reorder
 LDFLAGS=-m elf_i386 -no-startfiles --nmagic
 DEBUG?=no
+STRIP_ARGS=--strip-unneeded --strip-debug
 ifeq ($(DEBUG),yes)
-STRIP_ARGS=--strip-debug
-else
-STRIP_ARGS=--strip-debug --strip-dwo
+STRIP_ARGS=--strip-unneeded
 endif
 endif
 
