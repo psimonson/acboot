@@ -13,6 +13,10 @@ I cannot be held accountable for what YOU do with this code or what it does to y
 system. So please do NOT blaim me for your own mistakes. Also, this code will only work
 on 80386 or newer. Do NOT expect it to work on a dinosaur PC/laptop.
 
+### Known Bugs
+
+ - After you run the 'find' command ONLY if the file is found 'help' command doesn't work any more.
+
 ### Notes
 
  - Finish implementing my simple custom file system table. [Partially Done]
