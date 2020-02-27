@@ -55,47 +55,6 @@ __REGPARM void clrscr(unsigned char mode)
 		: : "a"(0x0000 | mode)
 	);
 }
-/* Draw a pixel on the screen.
- */
-__REGPARM void draw_pixel(unsigned char color, unsigned short x,
-	unsigned short y) {
-	asm volatile(
-		"int $0x10"
-		: : "a"(0x0c00 | color), "c"(x), "d"(y)
-	);
-}
-/* Timer for waiting inside of code.
- */
-__REGPARM void timer(unsigned short high, unsigned short low)
-{
-	asm volatile(
-		"int $0x15"
-		:
-		: "a"(0x8600), "c"(high), "d"(low)
-	);
-}
-/* Output val to port.
- */
-__REGPARM void outb(unsigned short port, unsigned char val)
-{
-	asm volatile(
-		"out %0, %1\n"
-		:
-		: "a"(val), "Nd"(port)
-	);
-}
-/* Return val from port.
- */
-__REGPARM unsigned char inb(unsigned short port)
-{
-	unsigned short output = 0;
-	asm volatile(
-		"in %1, %0\n"
-		: "=a"(output)
-		: "Nd"(port)
-	);
-	return output;
-}
 /* Get character from keyboard.
  */
 __REGPARM int getc(void)
@@ -113,45 +72,15 @@ __REGPARM void putc(int c)
 		"b"(0x0007), "c"(0x0001)
 	);
 }
-/* Check for keypress from keyboard.
- */
-__REGPARM int kbhit(void)
-{
-	unsigned char ch = 0;
-	asm volatile(
-		"int $0x16; mov %%al, %0" : "=m"(ch) : "a"(0x0100)
-	);
-	return ch;
-}
+
+/* ----------------------- C Only Functions ----------------------- */
+
 /* Check if character is whitespace.
  */
 int isspace(int c)
 {
 	return (c == ' ' || c == '\t' || c == '\v' || c == '\f' || c == '\r'
 		|| c == '\n');
-}
-/* Beep system.
- */
-void beep(unsigned short freq, unsigned short high, unsigned short low)
-{
-	outb(0x43, 182);
-	outb(0x42, (unsigned char)(freq));
-	outb(0x42, (unsigned char)(freq >> 8));
-	outb(0x61, inb(0x61) | 0x03);
-	timer(high, low);
-	outb(0x61, inb(0x61) & 0x3c);
-	timer(high, low);
-}
-/* Print text like a typer writer.
- */
-void _type(const char *s, unsigned short freq, unsigned short high,
-	unsigned short low)
-{
-	while(*s) {
-		putc(*s++);
-		if(!isspace(*s))
-			beep(4560, 3, 0x0a20);
-	}
 }
 /* String length function.
  */

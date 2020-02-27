@@ -9,7 +9,7 @@ DEBUG?=no
 ifeq ($(DEBUG),yes)
 STRIP_ARGS=--strip-debug
 else
-STRIP_ARGS=--strip-debug --strip-dwo --strip-unneeded
+STRIP_ARGS=--strip-debug --strip-dwo
 endif
 endif
 
@@ -32,13 +32,13 @@ ifeq ($(DEBUG),no)
 	strip $(STRIP_ARGS) $@
 endif
 
-shell.elf: shell.c.o stdio.c.o disk.c.o fs.c.o
+shell.elf: shell.c.o stdio.c.o system.c.o disk.c.o fs.c.o
 	$(LD) $(LDFLAGS) -T shell.ld -o $@ $^
 ifeq ($(DEBUG),no)
 	strip $(STRIP_ARGS) $@
 endif
 
-graph.elf: graph.c.o stdio.c.o disk.c.o
+graph.elf: graph.c.o stdio.c.o special.c.o system.c.o disk.c.o
 	$(LD) $(LDFLAGS) -T link.ld -o $@ $^
 ifeq ($(DEBUG),no)
 	strip $(STRIP_ARGS) $@

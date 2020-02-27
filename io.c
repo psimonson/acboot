@@ -49,7 +49,8 @@ void main(void)
 		else
 			printf("File: %s Not found.\r\n");
 	}
-	type("Press any key to reboot...\r\n");
+	printf("Press any key to reboot...\r\n");
+	(void)getc();
 	asm volatile(
 		"jmpl $0x0000, $0xffff"
 	);

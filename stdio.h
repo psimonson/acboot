@@ -11,23 +11,18 @@
 
 #include "attr.h"
 
+/* ---------------------- Inline ASM Functions ---------------------- */
+
 __REGPARM void setup(void);
 __REGPARM void getcur(unsigned char *x, unsigned char *y);
 __REGPARM void mvcur(unsigned char x, unsigned char y);
 __REGPARM void clrscr(unsigned char mode);
-__REGPARM void draw_pixel(unsigned char color, unsigned short x,
-	unsigned short y);
-__REGPARM void timer(unsigned short high, unsigned short low);
-__REGPARM void outb(unsigned short port, unsigned char val);
-__REGPARM unsigned char inb(unsigned short port);
 __REGPARM int getc(void);
 __REGPARM void putc(int c);
-__REGPARM int kbhit(void);
+
+/* --------------------------- C Functions -------------------------- */
+
 int isspace(int c);
-void beep(unsigned short freq, unsigned short high, unsigned short low);
-void _type(const char *s, unsigned short freq, unsigned short high,
-	unsigned short low);
-#define type(m) _type(m, 4560, 0x0005, 0x05a0)
 int strlen(const char *s);
 void reverse(char *s);
 void itoa(int n, char *s, int size);

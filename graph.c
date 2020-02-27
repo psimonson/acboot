@@ -10,6 +10,7 @@ asm(".code16gcc");
 asm("jmpl $0, $main");
 
 #include "stdio.h"
+#include "special.h"
 #include "types.h"
 #include "disk.h"
 
